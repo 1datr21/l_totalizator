@@ -1,0 +1,86 @@
+<html>
+	<head>
+		<title>ТотаLизатор</title>
+		<link rel="stylesheet"  href="./css/index.css" />
+		<link rel="icon" href="./img/favicon.ico" type="image/x-icon">
+		<style>
+		
+		</style>
+		<script language="javascript" src="./js/data.js" ></script>
+		<script language="javascript" src="./js/index.js" ></script>
+	</head>
+	<body>
+		
+		
+	
+	<table width="100%">
+		<tr>
+			<td valign="top" width="26%">
+				<fieldset valign="top">
+					<legend>Режим</legend>
+					<table>
+						<tr>
+							<td valign="top">			
+								<input type="radio" name="rb_action" value="names" id="rb_a_names" onclick="build_list_left('names')" checked /><label for="rb_a_names">Имена</label><br />
+								<input type="radio" name="rb_action" value="pop_names" id="rb_a_popnames" onclick="build_list_left('pop_names')" /><label for="rb_a_popnames">Популярные имена</label><br />
+								<input type="radio" name="rb_action" value="refs" id="rb_a_refs" onclick="build_list_left('refs')" /><label for="rb_a_refs">Ссылки</label>
+							
+								
+							</td>
+							<td valign="top">
+								
+								<label for="run_count">Запускать&nbsp;</label><input type="text" value="500" id="run_count" /><label for="run_count">&nbsp;раз</label><br />
+								<input type="checkbox" checked id="sharp_sets"><label for="sharp_sets">Только острые выборки</label><br />
+								<input type="checkbox" checked id="many_sel"><label for="many_sel">Запускать выборки по </label><input type="text" value="3" id="sel_count" size="3" /><br />
+								<input type="checkbox" id="use_cb_list" onclick="switch_ts()"><label for="use_cb_list">Из выбранных</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								<input type="submit" value="GO" onclick="run_it()" /><br />
+							</td>
+						</tr>
+					</table>
+				</fieldset>
+				<fieldset id="fs_ts" style="display:none">
+					<input type="submit" value="Сбросить" onclick="clear_table_sel()"><br />
+					<div style="margin-top:7px; margin-bottom:7px; border:1px; border-color:#777; border-style:solid; height:500px; overflow-y: scroll;"  valign="top">
+											
+						<table id="table_select" valign="top" width="100%"></table>
+						
+					</div>
+					<span id="left_sel_count"></span>
+				</fieldset>
+			</td>
+			<td valign="top" width="58%" rowspan="2">
+				<div id="div_load" style="display:none"><img src="./img/loader.gif" /></div>
+				<div id="toolbar_stat" style="display:none">
+					<button onclick="CopyTable()">Скопировать топ 3</button>	
+				</div>
+				<div style="overflow-x: auto;">
+					<div style="margin-top:7px; margin-bottom:7px; border:1px; border-color:#777; border-style:solid; height:700px; width:97%; overflow-y: auto;" id="div_stat"  valign="top">
+						
+						<table id="table_stat_full" valign="top">
+							<tr id="tr_stat"></tr>
+						</table>
+					</div>
+				</div>
+			</td>			
+			<td valign="top"  rowspan="2" width="20%">
+				<fieldset valign="top">
+					<legend>Попади в яблочко</legend>
+					<input type="submit" value="Сбросить" onclick="clear_cbs()"><br />
+					<!-- <input type="text" oninput="search_in_cbs(this)" /> -->
+					<div style="margin-top:7px; margin-bottom:7px; border:1px; border-color:#777; border-style:solid; height: 300px; overflow-y: scroll;">
+						<table id="earn_items" width="100%"></table>
+					</div>
+					<span id="right_sel_count"></span><br />
+					<input type="submit" value="Наработать" onclick="earn()">
+					<input type="submit" onclick="clear_earn_stat()" value="Очистить" />
+					
+					<table id="earn_stat"></table>
+					
+				</fieldset>
+				
+			</td>
+		</tr>		
+	</table>
+	</body>
+</html>

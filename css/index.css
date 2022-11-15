@@ -1,0 +1,53 @@
+	td.pl_1 { background-color : #ffcccc; }
+	td.pl_2 { background-color : #ffdede; }
+	td.pl_3 { background-color : #ffefef; }
+	td.pl_4 { background-color : #ffffff; }
+		
+	li.pl_1 { background-color : #ffcccc; }
+	li.pl_2 { background-color : #ffdede; }
+	li.pl_3 { background-color : #ffefef; }
+	li.pl_4 { background-color : #ffffff; }
+
+	button.btn_left_on { 
+		background-size: 20px 15px;
+		background-image : url('../img/gal_on.png');
+		background-repeat: no-repeat;
+		background-position: 15px 0px; 
+		padding-left: 3px;
+    	width: 40px;
+		text-align: left;
+		border-radius: 4px;
+	}
+
+	button.btn_left_off { 
+		background-size: 20px 15px;
+		background-image : url('../img/gal_off.png'); 
+		background-repeat: no-repeat;
+		background-position: 15px 0px; 
+		padding-left: 3px;
+    	width: 40px;
+		text-align: left;
+		border-radius: 4px;
+	}
+
+	button.btn_right_on { 
+		background-size: 20px 15px;
+		background-image : url('../img/gal_on.png');
+		background-repeat: no-repeat;
+		background-position: 3px 0px; 
+		padding-right: 3px;
+    	width: 40px;
+		text-align: right;
+		border-radius: 4px;
+	}
+
+	button.btn_right_off { 
+		background-size: 20px 15px;
+		background-image : url('../img/gal_off.png'); 
+		background-repeat: no-repeat;
+		background-position: 3px 0px; 
+		padding-right: 3px;
+    	width: 40px;
+		text-align: right;
+		border-radius: 4px;
+	}
