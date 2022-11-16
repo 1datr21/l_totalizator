@@ -1,7 +1,14 @@
-	td.pl_1 { background-color : #ffcccc; }
-	td.pl_2 { background-color : #ffdede; }
-	td.pl_3 { background-color : #ffefef; }
-	td.pl_4 { background-color : #ffffff; }
+.header { background: #D5BAE4; }
+.layout { position: relative;}
+div.layout  { position: absolute; width: 99%; margin: 0px;}
+.col1 {  min-width: 23%; max-width:23%; display: inline-block; vertical-align: top ;}
+.col2 {  left: 25%; min-width: 62%; max-width:62%; display: inline-block; vertical-align: top ;}
+.col3 {  right: 2px; min-width: 14%; max-width: 14%; display: inline-block; vertical-align: top; margin:0px;}
+
+	td.pl_1 { background-color : #ffcccc; font-family: Helvetica, Verdana, sans-serif; font-size:14px; }
+	td.pl_2 { background-color : #ffdede; font-family: Helvetica, Verdana, sans-serif; font-size:14px;  }
+	td.pl_3 { background-color : #ffefef; font-family: Helvetica, Verdana, sans-serif; font-size:14px;  }
+	td.pl_4 { background-color : #ffffff; font-family: Helvetica, Verdana, sans-serif; font-size:14px;  }
 		
 	li.pl_1 { background-color : #ffcccc; }
 	li.pl_2 { background-color : #ffdede; }

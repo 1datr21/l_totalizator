@@ -222,12 +222,18 @@
 
 			function run_it()
 			{
+				document.getElementById("btn_go").disabled = true;
+
 				ctr = 0;
 				h_stat = new Map();
+				
+				// show animation wheel
+				document.getElementById("div_stat").style.display = "none";
+				document.getElementById("div_load").style.display = "block";
+				document.getElementById("toolbar_stat").style.display = "none";
+
 				var count_to_run = parseInt(document.getElementById("run_count").getAttribute("value"));
-				
-				
-				
+								
 				rmode = document.querySelector('input[name="rb_action"]:checked').value;		
 
 				var sel_list = document.querySelector('input#use_cb_list').checked;				
@@ -266,10 +272,7 @@
 					return;
 				}
 
-				// show animation wheel
-				document.getElementById("div_stat").style.display = "none";
-				document.getElementById("div_load").style.display = "block";
-				document.getElementById("toolbar_stat").style.display = "none";
+				
 				
 				var sharp_sets = document.getElementById("sharp_sets").checked;
 				 
@@ -289,7 +292,7 @@
 						
 						do
 						{
-							
+							selection = new Object();
 							one_iteration(selection, count_to_run);
 							leader_count = get_leaders_count(selection);
 							
@@ -314,6 +317,7 @@
 					document.getElementById("div_load").style.display = "none";
 					document.getElementById("div_stat").style.display = "block";
 					document.getElementById("toolbar_stat").style.display = "block";
+					document.getElementById("btn_go").disabled = false;
 				},1000);
 				
 				
@@ -797,27 +801,31 @@
 						}
 						break;
 					case 'refs':
-						switch (rmode)
 						{
-							case 'names':
-							case 'pop_names':
-									var name_id = btn_obj.getAttribute("name_id");
-									
-									var cbs = document.querySelectorAll('#fs_ts input[type="checkbox"][name_id="'+name_id+'"]');
-									for(var _i=0;_i<cbs.length;_i++)
-									{
-										cbs[_i].checked = !cbs[_i].checked;
-									}
-									
-									obj_l_btns = document.querySelectorAll('button.btn_left[name_id="'+name_id+'"]');// document.getElementById(prefix_l + iid);
-								break;
-							case 'refs':
-									var iid = btn_obj.getAttribute("iid");
-									document.querySelector('#fs_ts input[type="checkbox"][iid="'+iid+'"]').checked = !document.querySelector('#fs_ts input[type="checkbox"][iid="'+iid+'"]').checked;
-									obj_l_btns = Array(); 
-									obj_l_btns.push(btn_obj);
-								break;
-							
+							var iid = btn_obj.getAttribute("iid");
+							var name_id = btn_obj.getAttribute("name_id");
+							switch (rmode)
+							{
+								case 'names':
+								case 'pop_names':
+										
+										
+										var cbs = document.querySelectorAll('#fs_ts input[type="checkbox"][name_id="'+name_id+'"]');
+										for(var _i=0;_i<cbs.length;_i++)
+										{
+											cbs[_i].checked = !cbs[_i].checked;
+										}
+										
+										obj_l_btns = document.querySelectorAll('button.btn_left[name_id="'+name_id+'"]');// document.getElementById(prefix_l + iid);
+									break;
+								case 'refs':
+										
+										document.querySelector('#fs_ts input[type="checkbox"][iid="'+iid+'"]').checked = !document.querySelector('#fs_ts input[type="checkbox"][iid="'+iid+'"]').checked;
+										obj_l_btns = Array(); 
+										//obj_l_btns.push(btn_obj);
+										obj_l_btns = document.querySelectorAll('button.btn_left[iid="'+iid+'"]');// 
+									break;								
+							}
 						}
 						break;
 					
@@ -839,7 +847,12 @@
 				if(rb!=null)
 				{
 					rb.checked = !rb.checked;
-					draw_btn_right(_btn_obj);
+					var btns = document.querySelectorAll("table.tbl_selection button.btn_right[rid='"+_id+"']");
+					for(var _idx=0; _idx<btns.length; _idx++)
+					{
+						draw_btn_right(btns[_idx]);
+					}
+					
 				}
 			}
 			
@@ -948,7 +961,12 @@
 			function ei_rb_change(obj)
 			{
 				var rid = obj.getAttribute("iid");
-				draw_btn_right(document.querySelectorAll('button.btn_right[rid="'+rid+'"]')[0]);				
+				var btns_right = document.querySelectorAll('button.btn_right[rid="'+rid+'"]');
+				for(var _idx=0; _idx<btns_right.length; _idx++)
+				{
+					draw_btn_right(btns_right[_idx]);
+				}
+				//(document.querySelectorAll('button.btn_right[rid="'+rid+'"]')[0]);				
 			}
 			
 			function ei_lb_change(obj)
