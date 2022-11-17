@@ -26,7 +26,7 @@
 						var the_table = document.createElement('table');
 						the_table.setAttribute("id","temp_table");
 
-						for(row_idx=0;row_idx<=max_count+1;row_idx++)	
+						for(row_idx=0;row_idx<=max_count;row_idx++)	
 						{
 							var tr_cloned = document.createElement('tr');
 							for(tbl_idx=0;tbl_idx<table_stat_full.querySelectorAll('table.tbl_selection').length;tbl_idx++)	
@@ -241,6 +241,24 @@
 				//Array.from(sorted.keys());
 			}
 
+			Counter.prototype.trashman = function(_map_array)
+			{
+				var s_keys = Array.from(this.ctrlist.keys());
+				for(j=0; j<s_keys.length; j++)
+				{
+					var cnt = 0;
+					for(idx_map=0;idx_map<_map_array.length;idx_map++)
+					{
+						if(_map_array[idx_map][s_keys[j]]==undefined)
+						{
+							cnt++;
+						}
+					}
+					if(cnt==3)
+						this.remove(s_keys[j]);
+				}
+			}
+
 			Counter.prototype.add_map = function(_map)
 			{
 				var keylist = Object.keys(_map);
@@ -431,8 +449,11 @@
 						//animate_draw(selection);
 					}
 					selection_list.push(selection);
+					
 					CounterObj.add_map(selection);
 				}
+
+				CounterObj.trashman(selection_list);
 							
 				var that = this;
 				setTimeout(function(){
@@ -615,21 +636,17 @@
 									if(document.querySelectorAll('#fs_ts input[name_id="'+name_id+'"][type="checkbox"]')[0].checked)
 									{
 										draw_btn_left_on(btn_obj);
-										//btn_obj.textContent = "Сбросить слева";
 									}
 									else
 									{
 										draw_btn_left_off(btn_obj);
-										//btn_obj.textContent = "Отметить слева";
 									}	
 								}
 								else
 									draw_btn_left_off(btn_obj);
-									//btn_obj.textContent = "Отметить слева";
 							}	
 							else
 								draw_btn_left_off(btn_obj);
-								//	btn_obj.textContent = "Отметить слева";
 							break;
 						case 'refs': 
 						
