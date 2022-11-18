@@ -346,11 +346,36 @@
 				}
 			}
 
-			
+			var Selection = function()
+			{
+				this.h_stat = new Map();
+				this.items = new Object();
+			}
+
+			Selection.prototype.get_leaders_count = function()
+			{
+				var keylist = Object.keys(this.items);// Array.from(sorted.keys());
+				var old_val = 0;
+				var count = 0;
+				for(var i=0;i<keylist.length;i++)
+				{
+					if((count>0)&&(this.items[keylist[i]]!=old_val))
+					{
+						return count;
+					}
+					else
+					{
+						count++;
+						old_val = this.items[keylist[i]];
+					}
+				}
+				return count;
+			}
 
 			var totalizator = function ()
 			{
 				this.item_list = Array();
+				//this.h_stat = new Map();
 			}
 
 			totalizator.prototype.build_item_list = function()
@@ -384,7 +409,7 @@
 				document.getElementById("btn_go").disabled = true;
 
 				ctr = 0;
-				h_stat = new Map();
+				
 				
 				// show animation wheel
 				document.getElementById("div_stat").style.display = "none";
@@ -394,8 +419,6 @@
 				var count_to_run = parseInt(document.getElementById("run_count").getAttribute("value"));
 								
 				rmode = document.querySelector('input[name="rb_action"]:checked').value;		
-
-								
 				
 				this.build_item_list();
 				
@@ -424,19 +447,21 @@
 				selection_list = Array();
 				for(sel_idx = 0; sel_idx<sel_cnt; sel_idx++)
 				{
+					//h_stat = new Map();
 					this.item_list = random_mixed_array(this.item_list);
 
-					var selection = new Object();
+					var selection = new Selection();
 					if(sharp_sets)
 					{	
 						leader_count = 0;
 						
 						do
 						{
-							selection = new Object();
+							//h_stat = new Map();
+							selection =  new Selection();
 							
 							this.one_iteration(selection, count_to_run);
-							leader_count = get_leaders_count(selection);
+							leader_count = selection.get_leaders_count();
 							
 						}
 						while(leader_count!=1)
@@ -459,7 +484,7 @@
 				setTimeout(function(){
 					for(sel_idx = 0; sel_idx<sel_cnt; sel_idx++)
 						{
-							animate_draw(selection_list[sel_idx], sel_idx);
+							that.animate_draw(selection_list[sel_idx], sel_idx);
 						}
 					
 					that.close_animation(true);
@@ -479,7 +504,7 @@
 				document.getElementById("btn_go").disabled = false;
 			}
 
-			totalizator.prototype.run_one = function(sorted)
+			totalizator.prototype.run_one = function(selection)
 			{						
 				curr_idx = -1;
 				do 
@@ -490,16 +515,16 @@
 				
 				var the_name = this.item_list[curr_idx];
 
-				if(h_stat.get(the_name)==undefined) h_stat.set(the_name,1);
-				else h_stat.set(the_name, h_stat.get(the_name)+1);							
+				if(selection.h_stat.get(the_name)==undefined) selection.h_stat.set(the_name,1);
+				else selection.h_stat.set(the_name, selection.h_stat.get(the_name)+1);							
 
 				ctr++;
 
-				build_map_sorted(h_stat,sorted);
+				build_map_sorted(selection.h_stat,selection.items);
 								
 			}
 
-			totalizator.prototype.one_iteration = function(sorted, count_to_run)
+			totalizator.prototype.one_iteration = function(selection, count_to_run)
 			{				
 				//reset_stat();
 								
@@ -507,12 +532,202 @@
 				for(var _i=0;_i<count_to_run; _i++)
 				{
 					//sorted = 
-					this.run_one(sorted);
+					this.run_one(selection);
 								
 				}
 				
 				//return sorted;
 			}
+
+			totalizator.prototype.animate_draw = function(sorted, sel_idx)
+			{
+			//	reset_stat();
+
+				var keylist = Object.keys(sorted.items);// Array.from(sorted.keys());
+				
+				var table_stat_full = document.getElementById("table_stat_full");			
+				var tr_stat = table_stat_full.childNodes[0].childNodes[0];// document.getElementById("tr_stat");	
+				var td_table = document.createElement('td');	
+				td_table.setAttribute("valign","top");
+				tr_stat.appendChild(td_table);		
+				var table_stat = document.createElement('table');
+				table_stat.setAttribute("class","tbl_selection");
+
+				if(tmode=='refs')
+				{
+					table_stat.innerHTML = "<tr><th>Ссылка</th><th>Процент</th></tr>";
+				}
+				else
+				{
+					table_stat.innerHTML = "<tr><th>Имя</th><th>Процент</th></tr>";		
+				}
+
+				td_table.appendChild(table_stat);	
+			//	console.log(keylist);
+				var pl = 1;
+				var old_proc = 0;
+				for(var i=0;i<keylist.length;i++)
+				{
+					
+					var procent = sorted.h_stat.get(keylist[i]) * 100/ctr;
+					if(pl<4)
+					{
+						if(procent<old_proc) pl++;						
+					}
+					
+					var the_id = null;
+					
+					switch(rmode)
+					{
+						case 'names': 
+								the_id = namelist.indexOf(keylist[i]);
+							break;
+						case 'pop_names': 
+								the_id = pop_namelist.indexOf(keylist[i]);
+							break;
+						case 'refs': 
+								ref_keys = Object.keys(reflist);
+								the_id = ref_keys.indexOf(keylist[i]);
+							break;				
+					}
+					
+					var r_id = null;
+					
+					switch(rmode)
+					{
+						case 'names': 
+						case 'pop_names':
+								r_id = namelist.indexOf(keylist[i]);
+							break;
+						case 'refs': 
+								r_id = namelist.indexOf(reflist[keylist[i]]);
+							break;				
+					}
+					
+					var l_id = null;
+					
+					switch(rmode)
+					{
+						case 'names': 
+								l_id = namelist.indexOf(keylist[i]);
+								name_id = namelist.indexOf(keylist[i]);
+							break;
+						case 'pop_names': 
+								//r_id = namelist.indexOf(keylist[i]);
+								l_id = pop_namelist.indexOf(keylist[i]);
+								name_id = namelist.indexOf(keylist[i]);
+							break;
+						case 'refs': 
+								l_id = ref_keys.indexOf(keylist[i]);;
+								name_id = namelist.indexOf(reflist[keylist[i]]);
+							break;				
+					}
+
+					var _className = "pl_"+pl;
+					var _className_tr = "tr_pl_"+pl;
+					if(rmode=='refs')
+					{
+						var the_tr = document.createElement('tr');
+						the_tr.className =  _className_tr;	
+						
+						var td_ref = document.createElement('td');
+						td_ref.className = _className;
+							
+						var the_a = document.createElement('a');
+						var ref = keylist[i];
+						the_a.textContent = ref;
+						the_a.setAttribute("href",ref);
+						the_a.setAttribute("target","ref_win");
+						td_ref.appendChild(the_a);
+							
+						var td_name = document.createElement('td');
+						td_name.textContent = reflist[ref];
+						td_name.className = _className;
+							
+						var td_proc = document.createElement('td');
+						td_proc.textContent = procent.toFixed(2).replace(/\./,',');
+						td_proc.className = _className;
+						
+						var td_btn1 = document.createElement('td');
+						td_btn1.className = _className;
+						var btn_1 = document.createElement('button');
+												
+						
+						btn_1.setAttribute("onclick","mark_left("+the_id+", this)");
+						btn_1.setAttribute("iid",l_id);
+						btn_1.setAttribute("name_id",name_id);
+						btn_1.setAttribute("class","btn_left");
+						
+						draw_btn_left(btn_1);
+						
+						td_btn1.appendChild(btn_1);
+							
+						var td_btn2 = document.createElement('td');
+						td_btn2.className = _className;
+						var btn_r = document.createElement('button');
+						
+						btn_r.setAttribute("onclick","mark_right("+r_id+", this)");
+						btn_r.setAttribute("class","btn_right");
+						btn_r.setAttribute("rid",r_id);
+						td_btn2.appendChild(btn_r);
+						draw_btn_right(btn_r);
+						
+						the_tr.appendChild(td_btn1);
+						the_tr.appendChild(td_ref);
+						the_tr.appendChild(td_name);
+						the_tr.appendChild(td_proc);
+						the_tr.appendChild(td_btn2);
+						table_stat.appendChild(the_tr);
+					}					
+					else
+					{
+						var the_tr = document.createElement('tr');
+						the_tr.className =  _className_tr;	
+						
+						var td_name = document.createElement('td');
+						td_name.className = _className;
+						td_name.textContent = keylist[i];
+						var td_proc = document.createElement('td');
+						td_proc.className = _className;						
+						td_proc.textContent = procent.toFixed(2).replace(/\./,',');
+							
+						var td_btn1 = document.createElement('td');
+						td_btn1.className = _className;
+						var btn_1 = document.createElement('button');
+						//btn_1.textContent = "Отметить слева";
+						btn_1.setAttribute("onclick","mark_left("+ the_id +", this)");
+						btn_1.setAttribute("iid",r_id);
+						btn_1.setAttribute("name_id",name_id);
+						btn_1.setAttribute("class","btn_left");
+						td_btn1.appendChild(btn_1);	
+						
+						draw_btn_left(btn_1);
+							
+						var td_btn2 = document.createElement('td');
+						td_btn2.className = _className;
+						var btn_r = document.createElement('button');
+						
+						var r_sel_ch = document.getElementById(prefix_r+r_id);
+																		
+						btn_r.setAttribute("onclick","mark_right("+ r_id+", this)");
+						btn_r.setAttribute("class","btn_right");
+						btn_r.setAttribute("rid",r_id);
+						td_btn2.appendChild(btn_r);
+						
+						draw_btn_right(btn_r);
+							
+						the_tr.appendChild(td_btn1);
+						the_tr.appendChild(td_name);
+						the_tr.appendChild(td_proc);
+						the_tr.appendChild(td_btn2);
+						table_stat.appendChild(the_tr);					
+					}
+					
+					old_proc = procent;
+				}
+			
+			}
+				
 			
 			var Totalizator = new totalizator();
 			function run_it()
@@ -520,23 +735,7 @@
 				Totalizator.run();
 			}
 
-			function get_leaders_count(sorted)
-			{
-				var keylist = Object.keys(sorted);// Array.from(sorted.keys());
-				var old_val = 0;
-				var count = 0;
-				for(var i=0;i<keylist.length;i++)
-				{
-					if((count>0)&&(sorted[keylist[i]]!=old_val))
-						return count;
-					else
-					{
-						count++;
-						old_val = sorted[keylist[i]];
-					}
-				}
-				return count;
-			}
+
 			
 			function reset_stat()
 			{
@@ -713,195 +912,7 @@
 			}
 			
 			
-			function animate_draw(sorted, sel_idx)
-			{
-			//	reset_stat();
-
-				var keylist = Object.keys(sorted);// Array.from(sorted.keys());
 				
-				var table_stat_full = document.getElementById("table_stat_full");			
-				var tr_stat = table_stat_full.childNodes[0].childNodes[0];// document.getElementById("tr_stat");	
-				var td_table = document.createElement('td');	
-				td_table.setAttribute("valign","top");
-				tr_stat.appendChild(td_table);		
-				var table_stat = document.createElement('table');
-				table_stat.setAttribute("class","tbl_selection");
-
-				if(tmode=='refs')
-				{
-					table_stat.innerHTML = "<tr><th>Ссылка</th><th>Процент</th></tr>";
-				}
-				else
-				{
-					table_stat.innerHTML = "<tr><th>Имя</th><th>Процент</th></tr>";		
-				}
-
-				td_table.appendChild(table_stat);	
-			//	console.log(keylist);
-				var pl = 1;
-				var old_proc = 0;
-				for(var i=0;i<keylist.length;i++)
-				{
-					
-					var procent = h_stat.get(keylist[i]) * 100/ctr;
-					if(pl<4)
-					{
-						if(procent<old_proc) pl++;						
-					}
-					
-					var the_id = null;
-					
-					switch(rmode)
-					{
-						case 'names': 
-								the_id = namelist.indexOf(keylist[i]);
-							break;
-						case 'pop_names': 
-								the_id = pop_namelist.indexOf(keylist[i]);
-							break;
-						case 'refs': 
-								ref_keys = Object.keys(reflist);
-								the_id = ref_keys.indexOf(keylist[i]);
-							break;				
-					}
-					
-					var r_id = null;
-					
-					switch(rmode)
-					{
-						case 'names': 
-						case 'pop_names':
-								r_id = namelist.indexOf(keylist[i]);
-							break;
-						case 'refs': 
-								r_id = namelist.indexOf(reflist[keylist[i]]);
-							break;				
-					}
-					
-					var l_id = null;
-					
-					switch(rmode)
-					{
-						case 'names': 
-								l_id = namelist.indexOf(keylist[i]);
-								name_id = namelist.indexOf(keylist[i]);
-							break;
-						case 'pop_names': 
-								//r_id = namelist.indexOf(keylist[i]);
-								l_id = pop_namelist.indexOf(keylist[i]);
-								name_id = namelist.indexOf(keylist[i]);
-							break;
-						case 'refs': 
-								l_id = ref_keys.indexOf(keylist[i]);;
-								name_id = namelist.indexOf(reflist[keylist[i]]);
-							break;				
-					}
-
-					var _className = "pl_"+pl;
-					var _className_tr = "tr_pl_"+pl;
-					if(rmode=='refs')
-					{
-						var the_tr = document.createElement('tr');
-						the_tr.className =  _className_tr;	
-						
-						var td_ref = document.createElement('td');
-						td_ref.className = _className;
-							
-						var the_a = document.createElement('a');
-						var ref = keylist[i];
-						the_a.textContent = ref;
-						the_a.setAttribute("href",ref);
-						the_a.setAttribute("target","ref_win");
-						td_ref.appendChild(the_a);
-							
-						var td_name = document.createElement('td');
-						td_name.textContent = reflist[ref];
-						td_name.className = _className;
-							
-						var td_proc = document.createElement('td');
-						td_proc.textContent = procent.toFixed(2).replace(/\./,',');
-						td_proc.className = _className;
-						
-						var td_btn1 = document.createElement('td');
-						td_btn1.className = _className;
-						var btn_1 = document.createElement('button');
-												
-						
-						btn_1.setAttribute("onclick","mark_left("+the_id+", this)");
-						btn_1.setAttribute("iid",l_id);
-						btn_1.setAttribute("name_id",name_id);
-						btn_1.setAttribute("class","btn_left");
-						
-						draw_btn_left(btn_1);
-						
-						td_btn1.appendChild(btn_1);
-							
-						var td_btn2 = document.createElement('td');
-						td_btn2.className = _className;
-						var btn_r = document.createElement('button');
-						
-						btn_r.setAttribute("onclick","mark_right("+r_id+", this)");
-						btn_r.setAttribute("class","btn_right");
-						btn_r.setAttribute("rid",r_id);
-						td_btn2.appendChild(btn_r);
-						draw_btn_right(btn_r);
-						
-						the_tr.appendChild(td_btn1);
-						the_tr.appendChild(td_ref);
-						the_tr.appendChild(td_name);
-						the_tr.appendChild(td_proc);
-						the_tr.appendChild(td_btn2);
-						table_stat.appendChild(the_tr);
-					}					
-					else
-					{
-						var the_tr = document.createElement('tr');
-						the_tr.className =  _className_tr;	
-						
-						var td_name = document.createElement('td');
-						td_name.className = _className;
-						td_name.textContent = keylist[i];
-						var td_proc = document.createElement('td');
-						td_proc.className = _className;						
-						td_proc.textContent = procent.toFixed(2).replace(/\./,',');
-							
-						var td_btn1 = document.createElement('td');
-						td_btn1.className = _className;
-						var btn_1 = document.createElement('button');
-						//btn_1.textContent = "Отметить слева";
-						btn_1.setAttribute("onclick","mark_left("+ the_id +", this)");
-						btn_1.setAttribute("iid",r_id);
-						btn_1.setAttribute("name_id",name_id);
-						btn_1.setAttribute("class","btn_left");
-						td_btn1.appendChild(btn_1);	
-						
-						draw_btn_left(btn_1);
-							
-						var td_btn2 = document.createElement('td');
-						td_btn2.className = _className;
-						var btn_r = document.createElement('button');
-						
-						var r_sel_ch = document.getElementById(prefix_r+r_id);
-																		
-						btn_r.setAttribute("onclick","mark_right("+ r_id+", this)");
-						btn_r.setAttribute("class","btn_right");
-						btn_r.setAttribute("rid",r_id);
-						td_btn2.appendChild(btn_r);
-						
-						draw_btn_right(btn_r);
-							
-						the_tr.appendChild(td_btn1);
-						the_tr.appendChild(td_name);
-						the_tr.appendChild(td_proc);
-						the_tr.appendChild(td_btn2);
-						table_stat.appendChild(the_tr);					
-					}
-					
-					old_proc = procent;
-				}
-			
-			}
-					
 			
 
 			function mark_top_3_left()
