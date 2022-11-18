@@ -249,7 +249,7 @@
 					var cnt = 0;
 					for(idx_map=0;idx_map<_map_array.length;idx_map++)
 					{
-						if(_map_array[idx_map][s_keys[j]]==undefined)
+						if(_map_array[idx_map].items[s_keys[j]]==undefined)
 						{
 							cnt++;
 						}
@@ -475,7 +475,7 @@
 					}
 					selection_list.push(selection);
 					
-					CounterObj.add_map(selection);
+					CounterObj.add_map(selection.items);
 				}
 
 				CounterObj.trashman(selection_list);
