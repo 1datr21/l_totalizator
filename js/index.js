@@ -3,84 +3,7 @@
 			var prefix_l='cb_sel_';
 			var prefix_r='cb_sel_r_';
 		
-			function CopyTable() 
-			{
-				//var body = document.body, 
-				var range, sel;
-				if (document.createRange && window.getSelection) {
-					range = document.createRange();
-					sel = window.getSelection();
-					sel.removeAllRanges();
-					try {
-						var table_stat_full = document.getElementById("table_stat_full");	
-						
-						var max_count = 0;
-						for(sel_idx=0;sel_idx<table_stat_full.querySelectorAll('table.tbl_selection').length;sel_idx++)	
-						{
-							var table_stat = table_stat_full.querySelectorAll('table.tbl_selection')[sel_idx];
-							var three_lng = table_stat.querySelectorAll("tr.tr_pl_1").length + table_stat.querySelectorAll("tr.tr_pl_2").length +table_stat.querySelectorAll("tr.tr_pl_3").length;
-							if(three_lng > max_count)
-								max_count = three_lng;
-						}					
-						
-						var the_table = document.createElement('table');
-						the_table.setAttribute("id","temp_table");
-
-						for(row_idx=0;row_idx<=max_count;row_idx++)	
-						{
-							var tr_cloned = document.createElement('tr');
-							for(tbl_idx=0;tbl_idx<table_stat_full.querySelectorAll('table.tbl_selection').length;tbl_idx++)	
-							{
-								var table_stat = table_stat_full.querySelectorAll('table.tbl_selection')[tbl_idx];
-								var tr_obj = table_stat.querySelectorAll("tr")[row_idx];
-								if(tr_obj.classList.contains("tr_pl_1") || tr_obj.classList.contains("tr_pl_2") || tr_obj.classList.contains("tr_pl_3"))
-								{
-									//var tr_cloned = table_stat.childNodes[tr_idx].cloneNode();								
-								
-									for(td_idx=1; td_idx<tr_obj.childNodes.length-1; td_idx++)
-									{
-										var cloned_td = tr_obj.childNodes[td_idx].cloneNode(true);
-										tr_cloned.appendChild(cloned_td);	
-																	
-									}
-
-									the_table.appendChild(tr_cloned);
-								}
-								else
-								{
-									for(td_idx=1; td_idx<tr_obj.childNodes.length-1; td_idx++)
-									{
-										var cloned_td = document.createElement('td');
-										tr_cloned.appendChild(cloned_td);	
-																	
-									}
-								}
-								var cloned_td = document.createElement('td');
-								tr_cloned.appendChild(cloned_td);	
-							}
-						}	
-						
-						document.getElementById("div_stat").appendChild(the_table);						
-						
-						range = document.createRange();
-						range.selectNode(the_table);					
-						sel.addRange(range);
-						
-						document.execCommand("Copy");
-						
-						document.getElementById("div_stat").removeChild(document.getElementById("temp_table"));
-						
-					} catch (e) {
-					/*	range.selectNode(el);
-						sel.addRange(range);*/
-					}
-				} else if (body.createTextRange) {
-				/*	range = body.createTextRange();
-					range.moveToElementText(el);
-					range.select();*/
-				}
-				
-			}
+			
 		
 			function getRandomInt(max) {
 			  return Math.floor(Math.random() * (max+1));
@@ -210,15 +133,15 @@
 				}
 			}
 			
-			var ctr = 0;
-			var h_stat = new Map();
-			var last_idx = -1;
-			var item_list = null;
+			
+			//var h_stat = new Map();
+			
+			//var item_list = null;
 			var ref_mode = false;
 			var tmode = null;
 			var rmode = null;
-			var sharp_sets = true;
-			var selection_list = Array();
+			
+			
 /* Класс счетчик */
 			var CounterObj= new Counter();
 
@@ -374,8 +297,49 @@
 
 			var totalizator = function ()
 			{
+				this.ctr = 0;
 				this.item_list = Array();
+				this.sharp_sets = true;
 				//this.h_stat = new Map();
+				this.last_idx = -1;
+				this.selection_list = Array();
+			}
+
+			totalizator.prototype.init = function()
+			{
+				var rbm_cbs = document.querySelectorAll('input[type="radio"][class="rb_mode"]');
+				for(var _i=0;_i<rbm_cbs.length;_i++)
+				{
+					rbm_cbs[_i].onclick = function()
+					{
+						left_list.build(this.getAttribute("value"));
+					}
+				}
+
+				var self = this;
+				
+
+				document.getElementById('btn_go').onclick = function()
+				{ 
+					self.run();
+				}
+
+				document.getElementById('use_cb_list').onchange = function()
+				{ 
+					self.switch_ts();
+				}
+			}
+
+			totalizator.prototype.switch_ts = function()
+			{
+				if(document.getElementById("fs_ts").style.display=='none')
+				{
+					document.getElementById("fs_ts").style.display='block';
+				}
+				else
+				{
+					document.getElementById("fs_ts").style.display='none';
+				}
 			}
 
 			totalizator.prototype.build_item_list = function()
@@ -403,12 +367,12 @@
 						break;				
 				}
 			}
-
+		
 			totalizator.prototype.run = function()
 			{
 				document.getElementById("btn_go").disabled = true;
 
-				ctr = 0;
+				this.ctr = 0;
 				
 				
 				// show animation wheel
@@ -436,22 +400,22 @@
 					return;
 				}				
 				
-				var sharp_sets = document.getElementById("sharp_sets").checked;
+				this.sharp_sets = document.getElementById("sharp_sets").checked;
 				 
 				var sel_cnt = 1;
 				if(document.getElementById("many_sel").checked)
 					sel_cnt = document.getElementById("sel_count").value;
 
-				reset_stat();
+				this.reset_stat();
 
-				selection_list = Array();
+				this.selection_list = Array();
 				for(sel_idx = 0; sel_idx<sel_cnt; sel_idx++)
 				{
 					//h_stat = new Map();
 					this.item_list = random_mixed_array(this.item_list);
 
 					var selection = new Selection();
-					if(sharp_sets)
+					if(this.sharp_sets)
 					{	
 						leader_count = 0;
 						
@@ -473,18 +437,18 @@
 						this.one_iteration(selection, count_to_run);
 						//animate_draw(selection);
 					}
-					selection_list.push(selection);
+					this.selection_list.push(selection);
 					
 					CounterObj.add_map(selection.items);
 				}
 
-				CounterObj.trashman(selection_list);
+				CounterObj.trashman(this.selection_list);
 							
 				var that = this;
 				setTimeout(function(){
 					for(sel_idx = 0; sel_idx<sel_cnt; sel_idx++)
 						{
-							that.animate_draw(selection_list[sel_idx], sel_idx);
+							result_list.animate_draw(that.selection_list[sel_idx], sel_idx, that.ctr);
 						}
 					
 					that.close_animation(true);
@@ -506,19 +470,25 @@
 
 			totalizator.prototype.run_one = function(selection)
 			{						
-				curr_idx = -1;
-				do 
-				{				
-					curr_idx = getExRandInt(this.item_list.length-1,10);
-				}
-				while (last_idx==curr_idx);
 				
+				/*
+				do 
+				{	
+					*/			
+					curr_idx = getExRandInt(this.item_list.length-1,10);
+				/*
+				}				
+				while (this.last_idx==curr_idx);
+				*/
+				
+				this.last_idx = curr_idx;
+
 				var the_name = this.item_list[curr_idx];
 
 				if(selection.h_stat.get(the_name)==undefined) selection.h_stat.set(the_name,1);
 				else selection.h_stat.set(the_name, selection.h_stat.get(the_name)+1);							
 
-				ctr++;
+				this.ctr++;
 
 				build_map_sorted(selection.h_stat,selection.items);
 								
@@ -529,6 +499,7 @@
 				//reset_stat();
 								
 				//var sorted = null;
+				this.last_idx = -1;
 				for(var _i=0;_i<count_to_run; _i++)
 				{
 					//sorted = 
@@ -539,7 +510,104 @@
 				//return sorted;
 			}
 
-			totalizator.prototype.animate_draw = function(sorted, sel_idx)
+			
+			
+			totalizator.prototype.reset_stat = function()
+			{
+				var table_stat_full = document.getElementById("table_stat_full");
+				
+				table_stat_full.innerHTML = "<tr></tr>";
+				
+				
+			//	document.getElementById("stat").style.display = 'none';
+				table_stat_full.style.display = 'block';
+			}
+			
+			var Totalizator = new totalizator();
+			
+			function ResultList()
+			{
+				this.left_list = null;
+				this.right_list = null;
+			}
+
+			ResultList.prototype.CopyTable = function() 
+			{
+				//var body = document.body, 
+				var range, sel;
+				if (document.createRange && window.getSelection) {
+					range = document.createRange();
+					sel = window.getSelection();
+					sel.removeAllRanges();
+					try {
+						var table_stat_full = document.getElementById("table_stat_full");	
+						
+						var max_count = 0;
+						for(sel_idx=0;sel_idx<table_stat_full.querySelectorAll('table.tbl_selection').length;sel_idx++)	
+						{
+							var table_stat = table_stat_full.querySelectorAll('table.tbl_selection')[sel_idx];
+							var three_lng = table_stat.querySelectorAll("tr.tr_pl_1").length + table_stat.querySelectorAll("tr.tr_pl_2").length +table_stat.querySelectorAll("tr.tr_pl_3").length;
+							if(three_lng > max_count)
+								max_count = three_lng;
+						}					
+						
+						var the_table = document.createElement('table');
+						the_table.setAttribute("id","temp_table");
+
+						for(row_idx=0;row_idx<=max_count;row_idx++)	
+						{
+							var tr_cloned = document.createElement('tr');
+							for(tbl_idx=0;tbl_idx<table_stat_full.querySelectorAll('table.tbl_selection').length;tbl_idx++)	
+							{
+								var table_stat = table_stat_full.querySelectorAll('table.tbl_selection')[tbl_idx];
+								var tr_obj = table_stat.querySelectorAll("tr")[row_idx];
+								if(tr_obj.classList.contains("tr_pl_1") || tr_obj.classList.contains("tr_pl_2") || tr_obj.classList.contains("tr_pl_3"))
+								{
+									//var tr_cloned = table_stat.childNodes[tr_idx].cloneNode();								
+								
+									for(td_idx=1; td_idx<tr_obj.childNodes.length-1; td_idx++)
+									{
+										var cloned_td = tr_obj.childNodes[td_idx].cloneNode(true);
+										tr_cloned.appendChild(cloned_td);	
+																	
+									}
+
+									the_table.appendChild(tr_cloned);
+								}
+								else
+								{
+									for(td_idx=1; td_idx<tr_obj.childNodes.length-1; td_idx++)
+									{
+										var cloned_td = document.createElement('td');
+										tr_cloned.appendChild(cloned_td);	
+																	
+									}
+								}
+								var cloned_td = document.createElement('td');
+								tr_cloned.appendChild(cloned_td);	
+							}
+						}	
+						
+						document.getElementById("div_stat").appendChild(the_table);						
+						
+						range = document.createRange();
+						range.selectNode(the_table);					
+						sel.addRange(range);
+						
+						document.execCommand("Copy");
+						
+						document.getElementById("div_stat").removeChild(document.getElementById("temp_table"));
+						
+					} catch (e) {
+					
+					}
+				} else if (body.createTextRange) {
+
+				}
+				
+			}
+
+			ResultList.prototype.animate_draw = function(sorted, sel_idx, ctr_total)
 			{
 			//	reset_stat();
 
@@ -569,7 +637,7 @@
 				for(var i=0;i<keylist.length;i++)
 				{
 					
-					var procent = sorted.h_stat.get(keylist[i]) * 100/ctr;
+					var procent = sorted.h_stat.get(keylist[i]) * 100/ctr_total;
 					if(pl<4)
 					{
 						if(procent<old_proc) pl++;						
@@ -652,13 +720,15 @@
 						td_btn1.className = _className;
 						var btn_1 = document.createElement('button');
 												
-						
-						btn_1.setAttribute("onclick","mark_left("+the_id+", this)");
+						var self = this;
+
+						btn_1.onclick = function() { self.mark_left(the_id, this); }
+						//btn_1.setAttribute("onclick","mark_left("+the_id+", this)");
 						btn_1.setAttribute("iid",l_id);
 						btn_1.setAttribute("name_id",name_id);
 						btn_1.setAttribute("class","btn_left");
 						
-						draw_btn_left(btn_1);
+						this.draw_btn_left(btn_1);
 						
 						td_btn1.appendChild(btn_1);
 							
@@ -666,11 +736,12 @@
 						td_btn2.className = _className;
 						var btn_r = document.createElement('button');
 						
-						btn_r.setAttribute("onclick","mark_right("+r_id+", this)");
+						//btn_r.setAttribute("onclick","mark_right("+r_id+", this)");
+						btn_r.onclick = function() { self.mark_right(the_id, this); }
 						btn_r.setAttribute("class","btn_right");
 						btn_r.setAttribute("rid",r_id);
 						td_btn2.appendChild(btn_r);
-						draw_btn_right(btn_r);
+						this.draw_btn_right(btn_r);
 						
 						the_tr.appendChild(td_btn1);
 						the_tr.appendChild(td_ref);
@@ -695,13 +766,15 @@
 						td_btn1.className = _className;
 						var btn_1 = document.createElement('button');
 						//btn_1.textContent = "Отметить слева";
-						btn_1.setAttribute("onclick","mark_left("+ the_id +", this)");
+						//btn_1.setAttribute("onclick","mark_left("+ the_id +", this)");
+						var self = this;
+						btn_1.onclick = function() { self.mark_left(the_id, this); };
 						btn_1.setAttribute("iid",r_id);
 						btn_1.setAttribute("name_id",name_id);
 						btn_1.setAttribute("class","btn_left");
 						td_btn1.appendChild(btn_1);	
 						
-						draw_btn_left(btn_1);
+						this.draw_btn_left(btn_1);
 							
 						var td_btn2 = document.createElement('td');
 						td_btn2.className = _className;
@@ -709,12 +782,13 @@
 						
 						var r_sel_ch = document.getElementById(prefix_r+r_id);
 																		
-						btn_r.setAttribute("onclick","mark_right("+ r_id+", this)");
+						//btn_r.setAttribute("onclick","mark_right("+ r_id+", this)");
+						btn_r.onclick = function() { self.mark_right(the_id, this); };
 						btn_r.setAttribute("class","btn_right");
 						btn_r.setAttribute("rid",r_id);
 						td_btn2.appendChild(btn_r);
 						
-						draw_btn_right(btn_r);
+						this.draw_btn_right(btn_r);
 							
 						the_tr.appendChild(td_btn1);
 						the_tr.appendChild(td_name);
@@ -727,30 +801,15 @@
 				}
 			
 			}
-				
-			
-			var Totalizator = new totalizator();
-			function run_it()
+
+			ResultList.prototype.init = function()
 			{
-				Totalizator.run();
+				var self = this;
+				document.getElementById('mark_top_3').onclick = function(){ self.mark_top_3_left(); };
+				document.getElementById('btn_copy_table').onclick = function(){ self.CopyTable(); }
 			}
 
-
-			
-			function reset_stat()
-			{
-				var table_stat_full = document.getElementById("table_stat_full");
-				
-				table_stat_full.innerHTML = "<tr></tr>";
-				
-				
-			//	document.getElementById("stat").style.display = 'none';
-				table_stat_full.style.display = 'block';
-			}
-			
-						
-
-			function draw_btn_right_off(btn_obj)	
+			ResultList.prototype.draw_btn_right_off = function(btn_obj)	
 			{
 				btn_obj.textContent = "->";	
 				btn_obj.classList.remove("btn_right_on");
@@ -758,7 +817,7 @@
 				btn_obj.setAttribute("title","Выбрать справа");
 			}
 
-			function draw_btn_right_on(btn_obj)	
+			ResultList.prototype.draw_btn_right_on = function(btn_obj)	
 			{
 				btn_obj.textContent = "->";
 				btn_obj.classList.remove("btn_right_off");
@@ -766,7 +825,7 @@
 				btn_obj.setAttribute("title","Сбросить слева");
 			}
 			
-			function draw_btn_right(btn_obj)
+			ResultList.prototype.draw_btn_right = function(btn_obj)
 			{
 				if(btn_obj!=null)
 				{
@@ -777,17 +836,17 @@
 						{
 							if(document.querySelectorAll('#earn_items input[name_id="'+r_id+'"][type="checkbox"]')[0].checked)
 							{
-								draw_btn_right_on(btn_obj);//btn_obj.textContent = "Сбросить справа";
+								this.draw_btn_right_on(btn_obj);//btn_obj.textContent = "Сбросить справа";
 							}
 							else
 							{
-								draw_btn_right_off(btn_obj);//btn_obj.textContent = "Отметить справа";
+								this.draw_btn_right_off(btn_obj);//btn_obj.textContent = "Отметить справа";
 							}	
 						}
 					}
-					else draw_btn_right_off(btn_obj);//btn_obj.textContent = "Отметить справа";		
+					else this.draw_btn_right_off(btn_obj);//btn_obj.textContent = "Отметить справа";		
 				}	
-				else draw_btn_right_off(btn_obj);//btn_obj.textContent = "Отметить справа";
+				else this.draw_btn_right_off(btn_obj);//btn_obj.textContent = "Отметить справа";
 
 				var _count = document.querySelectorAll('#earn_items input[type="checkbox"]:checked').length;
 				if(_count)
@@ -800,7 +859,7 @@
 				}
 			}
 			
-			function draw_btn_left_off(btn_obj)	
+			ResultList.prototype.draw_btn_left_off = function(btn_obj)	
 			{
 				btn_obj.textContent = "<-";	
 				btn_obj.classList.remove("btn_left_on");
@@ -808,7 +867,7 @@
 				btn_obj.setAttribute("title","Выбрать слева");
 			}
 
-			function draw_btn_left_on(btn_obj)	
+			ResultList.prototype.draw_btn_left_on = function(btn_obj)	
 			{
 				btn_obj.textContent = "<-";
 				btn_obj.classList.remove("btn_left_off");
@@ -818,7 +877,7 @@
 
 			
 
-			function draw_btn_left(btn_obj)
+			ResultList.prototype.draw_btn_left = function(btn_obj)
 			{
 				if(btn_obj!=null)
 				{
@@ -834,18 +893,18 @@
 								{
 									if(document.querySelectorAll('#fs_ts input[name_id="'+name_id+'"][type="checkbox"]')[0].checked)
 									{
-										draw_btn_left_on(btn_obj);
+										this.draw_btn_left_on(btn_obj);
 									}
 									else
 									{
-										draw_btn_left_off(btn_obj);
+										this.draw_btn_left_off(btn_obj);
 									}	
 								}
 								else
-									draw_btn_left_off(btn_obj);
+									this.draw_btn_left_off(btn_obj);
 							}	
 							else
-								draw_btn_left_off(btn_obj);
+								this.draw_btn_left_off(btn_obj);
 							break;
 						case 'refs': 
 						
@@ -860,18 +919,18 @@
 											{
 												if(document.querySelectorAll('#fs_ts input[name_id="'+name_id+'"][type="checkbox"]')[0].checked)
 												{
-													draw_btn_left_on(btn_obj);//btn_obj.textContent = "Сбросить слева";
+													this.draw_btn_left_on(btn_obj);//btn_obj.textContent = "Сбросить слева";
 												}
 												else
 												{
-													draw_btn_left_off(btn_obj);//btn_obj.textContent = "Отметить слева";
+													this.draw_btn_left_off(btn_obj);//btn_obj.textContent = "Отметить слева";
 												}	
 											}
 											else
-												draw_btn_left_off(btn_obj);//btn_obj.textContent = "Отметить слева";
+												this.draw_btn_left_off(btn_obj);//btn_obj.textContent = "Отметить слева";
 										}	
 										else
-											draw_btn_left_off(btn_obj);//btn_obj.textContent = "Отметить слева";
+											this.draw_btn_left_off(btn_obj);//btn_obj.textContent = "Отметить слева";
 										break;
 									case 'refs':
 											iid = btn_obj.getAttribute('iid');
@@ -881,18 +940,18 @@
 												{
 													if(document.querySelectorAll('#fs_ts input[iid="'+iid+'"][type="checkbox"]')[0].checked)
 													{
-														draw_btn_left_on(btn_obj);//btn_obj.textContent = "Сбросить слева";
+														this.draw_btn_left_on(btn_obj);//btn_obj.textContent = "Сбросить слева";
 													}
 													else
 													{
-														draw_btn_left_off(btn_obj);//draw_btn_left_off(btn_obj);//btn_obj.textContent = "Отметить слева";
+														this.draw_btn_left_off(btn_obj);//draw_btn_left_off(btn_obj);//btn_obj.textContent = "Отметить слева";
 													}	
 												}
 												else
-													draw_btn_left_off(btn_obj);//btn_obj.textContent = "Отметить слева";
+													this.draw_btn_left_off(btn_obj);//btn_obj.textContent = "Отметить слева";
 											}	
 											else
-												draw_btn_left_off(btn_obj);//btn_obj.textContent = "Отметить слева";
+												this.draw_btn_left_off(btn_obj);//btn_obj.textContent = "Отметить слева";
 										break;
 								}
 							break;	
@@ -910,25 +969,19 @@
 					document.getElementById("left_sel_count").innerHTML = "";
 				}
 			}
-			
-			
-				
-			
-
-			function mark_top_3_left()
+								
+			ResultList.prototype.mark_top_3_left = function()
 			{
-				clear_table_sel();
+				left_list.Clear();
 				var btns_l_list = document.querySelectorAll('table.tbl_selection td.pl_1 button.btn_left, table.tbl_selection td.pl_2 button.btn_left, table.tbl_selection td.pl_3 button.btn_left');
 				for(var _i=0;_i<btns_l_list.length;_i++)
 				{
-					mark_left(btns_l_list[_i].getAttribute("iid"), btns_l_list[_i], true);
+					this.mark_left(btns_l_list[_i].getAttribute("iid"), btns_l_list[_i], true);
 				}
 			}
 			
-			function mark_left(_id, btn_obj, bool_val=null)
+			ResultList.prototype.mark_left = function(_id, btn_obj, bool_val=null)
 			{
-				//document.getElementById('cb_sel_'+_id).checked = true;
-			//	var r_mode = document.querySelector('input[name="rb_action"]:checked').value;
 				var obj_l_btns = null;
 				switch (tmode)
 				{
@@ -1017,13 +1070,13 @@
 				{	
 					for(var _i=0;_i<obj_l_btns.length;_i++)
 					{
-						draw_btn_left(obj_l_btns[_i]);
+						this.draw_btn_left(obj_l_btns[_i]);
 					}
 				}
 			
 			}
 			
-			function mark_right(_id, _btn_obj)
+			ResultList.prototype.mark_right = function(_id, _btn_obj)
 			{
 				var rb = document.getElementById(prefix_r+_id);
 				if(rb!=null)
@@ -1032,17 +1085,22 @@
 					var btns = document.querySelectorAll("table.tbl_selection button.btn_right[rid='"+_id+"']");
 					for(var _idx=0; _idx<btns.length; _idx++)
 					{
-						draw_btn_right(btns[_idx]);
+						this.draw_btn_right(btns[_idx]);
 					}
 					
 				}
 			}
+
 			
-			var earn_map = new Map();
 			
-			function earn()
+			function RightList()
 			{
-				earn_map = new Map();
+				this.earn_map = new Map();
+			}			
+				
+			RightList.prototype.run = function()
+			{
+				this.earn_map = new Map();
 				var earn_stat = document.getElementById("earn_stat");
 				
 				var earn_items = document.getElementById("earn_items");
@@ -1052,11 +1110,11 @@
 					var cb = the_tr.childNodes[0].childNodes[0];
 					if(cb.checked)
 					{
-						earn_map.set(cb.getAttribute("value"), 0);
+						this.earn_map.set(cb.getAttribute("value"), 0);
 					}
 				}
 				
-				var keylist = Array.from(earn_map.keys());
+				var keylist = Array.from(this.earn_map.keys());
 				var summ = 0;
 				
 				var nl_clone = random_mixed_array(arrayClone(namelist));
@@ -1070,16 +1128,16 @@
 						rand_girl = nl_clone[curr_idx];
 						ctr++;
 					}	
-					earn_map.set(keylist[i],ctr);
+					this.earn_map.set(keylist[i],ctr);
 					summ+=ctr;					
 				}
 				
 				for(var i=0;i<keylist.length;i++)
 				{
-					var procent = 100 - earn_map.get(keylist[i])*100/summ;
-					earn_map.set(keylist[i],procent);
+					var procent = 100 - this.earn_map.get(keylist[i])*100/summ;
+					this.earn_map.set(keylist[i],procent);
 				}
-				var sorted = sort_map(earn_map);
+				var sorted = sort_map(this.earn_map);
 				keylist = Array.from(sorted.keys());
 				//clear_earn_stat();
 				document.getElementById("earn_stat").innerHTML = "<tr><th>Имя</th><th>Вероятность</th></tr>";
@@ -1098,32 +1156,8 @@
 				}
 				
 			}
-			
-			function clear_table_sel()
-			{
-				var earn_items = document.getElementById("table_select");
-				for(var i=0;i<earn_items.childNodes.length;i++)
-				{
-					var the_tr = earn_items.childNodes[i];
-					var cb = the_tr.childNodes[0].childNodes[0];
-					cb.checked = false;
-					ei_lb_change(cb);
-				}
-			}
-			
-			function switch_ts()
-			{
-				if(document.getElementById("fs_ts").style.display=='none')
-				{
-					document.getElementById("fs_ts").style.display='block';
-				}
-				else
-				{
-					document.getElementById("fs_ts").style.display='none';
-				}
-			}
-			
-			function clear_cbs()
+						
+			RightList.prototype.clear = function()
 			{
 				var earn_items = document.getElementById("earn_items");
 				for(var i=0;i<earn_items.childNodes.length;i++)
@@ -1131,108 +1165,40 @@
 					var the_tr = earn_items.childNodes[i];
 					var cb = the_tr.childNodes[0].childNodes[0];
 					cb.checked = false;
-					ei_rb_change(cb);
+					this.cb_changed(cb);
 				}
 			}
-			function clear_earn_stat()
+
+			RightList.prototype.clear_stat = function()
 			{
 				document.getElementById("earn_stat").innerHTML = "";
 				//document.getElementById("earn_stat").innerHTML = <tr><th>Имя</th><th>Вероятность</th></tr>";
 			}
 			
-			function ei_rb_change(obj)
+			RightList.prototype.cb_changed = function(obj)
 			{
 				var rid = obj.getAttribute("iid");
 				var btns_right = document.querySelectorAll('button.btn_right[rid="'+rid+'"]');
 				for(var _idx=0; _idx<btns_right.length; _idx++)
 				{
-					draw_btn_right(btns_right[_idx]);
+					result_list.draw_btn_right(btns_right[_idx]);
 				}
 				//(document.querySelectorAll('button.btn_right[rid="'+rid+'"]')[0]);				
 			}
 			
-			function ei_lb_change(obj)
-			{
-				switch(tmode)
-					{
-						case 'names': 			
-						case 'pop_names': 
-							var btns = document.querySelectorAll('button.btn_left[name_id="'+obj.getAttribute("name_id")+'"]');
-							for(var _i=0;_i<btns.length;_i++)
-							{
-								draw_btn_left(btns[_i]);	
-							}
-							break;
-						case 'refs': 
-							switch(rmode)
-							{
-								case 'refs': 
-									var btns = document.querySelectorAll('button.btn_left[iid="'+obj.getAttribute("iid")+'"]');
-									for(var _i=0;_i<btns.length;_i++)
-									{
-										draw_btn_left(btns[_i]);	
-									} 
-									break;
-								case 'names': 			
-								case 'pop_names': 
-									if(document.querySelectorAll('#fs_ts input[type="checkbox"][name_id="'+obj.getAttribute("name_id")+'"]:checked').length==0)
-									{
-										var btns = document.querySelectorAll('button.btn_left[name_id="'+obj.getAttribute("name_id")+'"]');
-										for(var _i=0;_i<btns.length;_i++)
-										{
-											draw_btn_left(btns[_i]);	
-										}
-									}
-									break;
-							}
-							//	r_id = namelist.indexOf(reflist[keylist[i]]);
-							break;				
-					}
-					/*
-				var oid = obj.getAttribute("iid");
-				if(obj.checked)
-				{
-					document.querySelectorAll('button.btn_left[iid="'+oid+'"]').forEach(
-						function(el)
-						{
-							el.textContent = "Сбросить слева";
-						});
-				}
-				else
-				{
-					document.querySelectorAll('button.btn_left[iid="'+oid+'"]').forEach(
-						function(el)
-						{
-							el.textContent = "Отметить слева";
-						});
-				}*/
-			}
-			
-			
-			document.addEventListener("DOMContentLoaded", function(event) 
-				{ 
-					build_list_right('names');
-					build_list_left('names');
-					document.getElementById('btn_ctr').onclick = function()
-					{ 
-						CounterObj.show_hide(); 
-					}
-					document.getElementById('btn_ctr_clear').onclick = function()
-					{ 
-						CounterObj.clear(); 
-					}
-				}
-			);
-			
-			function build_list_right(r_mode)
+			RightList.prototype.build = function(r_mode)
 			{
 				var table_id = "earn_items";
 				var prefix='cb_sel_r_'; 
-				var onchange_ev='ei_rb_change(this)';
 				var res_items = document.getElementById(table_id);
 				res_items.innerHTML = "";
 				var items = null;
 				 
+				var self = this;
+				document.getElementById('rl_clear').onclick = function(){ self.clear(this) };
+				document.getElementById('rl_run').onclick = this.run;
+				document.getElementById('clear_stat').onclick = function(){ self.clear_stat(this) };
+
 				items = arrayClone(namelist);
 				items.sort();
 				
@@ -1266,7 +1232,9 @@
 					cb.setAttribute('name_id',name_id);
 					cb.setAttribute('id',el_id);
 					cb.setAttribute('value',items[i]);
-					cb.setAttribute('onchange',onchange_ev);
+					//cb.setAttribute('onchange',onchange_ev);
+					var self = this;
+					cb.onchange = function() { self.cb_changed (this); };
 					
 					var td_1 = document.createElement('td');
 					var obj_label = document.createElement('label');
@@ -1286,16 +1254,22 @@
 				}
 				
 			}
-			
+		
+			function LeftList()
+			{
+				this.mode = null;
+			}
 
-			function build_list_left(t_mode)
+			LeftList.prototype.build = function(t_mode)
 			{
 				CounterObj.clear();
+
+				this.mode = t_mode;
 
 				tmode = t_mode;
 				var table_id =  'table_select';
 				var prefix='cb_sel_';
-				var onchange_ev='ei_lb_change(this)';
+
 				var res_items = document.getElementById(table_id);
 				res_items.innerHTML = "";
 				var items = null;
@@ -1353,11 +1327,19 @@
 					}
 					
 					var el_id = prefix_l+the_id;
+					cb.setAttribute('class','cb_ll');
 					cb.setAttribute('iid',the_id);
 					cb.setAttribute('name_id',name_id);
 					cb.setAttribute('id',el_id);
 					cb.setAttribute('value',items[i]);
-					cb.setAttribute('onchange',onchange_ev);
+
+					var self = this;
+					cb.onchange = function()
+					{
+						self.ll_cb_changed(this);
+					};
+
+					//cb.setAttribute('onchange',onchange_ev);
 					
 					var td_1 = document.createElement('td');
 					var obj_label = document.createElement('label');
@@ -1404,14 +1386,126 @@
 					
 				for(var _i=0;_i<objs.length;_i++)
 				{
-					draw_btn_left(objs[_i]);						
+					result_list.draw_btn_left(objs[_i]);						
 				}
+				
+				var self = this;
+				document.getElementById("ll_clear").onclick = function()
+				{
+					self.Clear(this);
+				}
+
+				document.getElementById("ll_export").onclick = function()
+				{
+					self.export_to_str();
+				}
+
+				document.getElementById("ll_import").onclick = function()
+				{
+					self.import_from_str();
+				}				
+			}
+
+			LeftList.prototype.import_from_str = function()
+			{
+				var txt = navigator.clipboard.readText();
+			}
+
+			LeftList.prototype.export_to_str = function()
+			{
+				var cb_list = document.querySelectorAll("table#table_select input.cb_ll[type=checkbox]:checked");
+				var str_res = "";
+				var values = [].map.call(cb_list, function(obj) {
+					return obj.value;
+				  });
+				var str = values.join(", ");
+
+				navigator.clipboard.writeText(str).then(function() {
+					//console.log('Async: Copying to clipboard was successful!');
+				  }, function(err) {
+					console.error('Async: Could not copy text: ', err);
+				  });
+			}
+
+			LeftList.prototype.ll_cb_changed = function(obj)
+			{
+				switch(tmode)
+					{
+						case 'names': 			
+						case 'pop_names': 
+							var btns = document.querySelectorAll('button.btn_left[name_id="'+obj.getAttribute("name_id")+'"]');
+							for(var _i=0;_i<btns.length;_i++)
+							{
+								result_list.draw_btn_left(btns[_i]);	
+							}
+							break;
+						case 'refs': 
+							switch(rmode)
+							{
+								case 'refs': 
+									var btns = document.querySelectorAll('button.btn_left[iid="'+obj.getAttribute("iid")+'"]');
+									for(var _i=0;_i<btns.length;_i++)
+									{
+										result_list.draw_btn_left(btns[_i]);	
+									} 
+									break;
+								case 'names': 			
+								case 'pop_names': 
+									if(document.querySelectorAll('#fs_ts input[type="checkbox"][name_id="'+obj.getAttribute("name_id")+'"]:checked').length==0)
+									{
+										var btns = document.querySelectorAll('button.btn_left[name_id="'+obj.getAttribute("name_id")+'"]');
+										for(var _i=0;_i<btns.length;_i++)
+										{
+											result_list.draw_btn_left(btns[_i]);	
+										}
+									}
+									break;
+							}
+							//	r_id = namelist.indexOf(reflist[keylist[i]]);
+							break;				
+					}				
+			}
+
+			LeftList.prototype.Clear = function()
+			{
+				var earn_items = document.getElementById("table_select");
+				for(var i=0;i<earn_items.childNodes.length;i++)
+				{
+					var the_tr = earn_items.childNodes[i];
+					var cb = the_tr.childNodes[0].childNodes[0];
+					cb.checked = false;
+					this.ll_cb_changed(cb);
+				}
+
 				
 			}
 			
-			function search_in_cbs(text_el)
-			{
-				var earn_items = document.getElementById("earn_items");
-				//window
-				earn_items.scrollBy(0, document.evaluate("//*[text()[contains(., '"+text_el.value+"')]][last()]", document.body).iterateNext().getBoundingClientRect().top);
-			}
+			var left_list = new LeftList();
+			var right_list = new RightList();
+
+			var result_list = new ResultList();
+			
+			document.addEventListener("DOMContentLoaded", function(event) 
+				{ 
+					right_list.build('names');
+					left_list.build('names');
+					result_list.init();
+					document.getElementById('btn_ctr').onclick = function()
+					{ 
+						CounterObj.show_hide(); 
+					}
+					document.getElementById('btn_ctr_clear').onclick = function()
+					{ 
+						CounterObj.clear(); 
+					}
+					
+					Totalizator.init();
+				}
+			);
+			
+
+			
+
+			
+			
+			
