@@ -1408,7 +1408,15 @@
 
 			LeftList.prototype.import_from_str = function()
 			{
-				var txt = navigator.clipboard.readText();
+				var data_str = document.getElementById("ll_data_str").value;
+				var valuelist = data_str.split(", ");
+				this.Clear();
+				for(_i=0;_i<valuelist.length;_i++)
+				{
+					var obj = document.querySelector("table#table_select input.cb_ll[type=checkbox][value='"+valuelist[_i]+"']");
+					obj.checked = true;
+					this.ll_cb_changed(obj);
+				}
 			}
 
 			LeftList.prototype.export_to_str = function()
@@ -1419,6 +1427,8 @@
 					return obj.value;
 				  });
 				var str = values.join(", ");
+
+				document.getElementById("ll_data_str").value = str;
 
 				navigator.clipboard.writeText(str).then(function() {
 					//console.log('Async: Copying to clipboard was successful!');
