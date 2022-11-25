@@ -60,6 +60,7 @@
 				<fieldset id="fs_ts" style="display:none">
 					<input type="submit" value="Сбросить" id="ll_clear" />
 					<input type="submit" value="Экспорт" id="ll_export" />
+					<input type="submit" value="Экспорт с добавлением" id="ll_export_add" />
 					<input type="submit" value="Импорт" id="ll_import" />
 					<br />
 					<textarea cols="51" rows="3" style="margin-top:4px;max-width:402px;" id="ll_data_str"></textarea>
@@ -75,9 +76,11 @@
 				<div id="div_load" style="display:none"><img src="./img/loader.gif" /></div>
 				<div id="toolbar_stat" style="display:none">
 					<button id="btn_copy_table">Скопировать топ 3</button>	
-					<button id="mark_top_3">Отметить все топы слева</button>
+					<button id="mark_top_3">Отметить все топы слева</button>					
 					<button	id="btn_ctr">Счетчик</button>	
 					<button id="btn_ctr_clear">Сбросить счетчик</button>
+					<!-- <br />
+					<input type="checkbox" id="cb_sel_on_sel" />Отмечать среди отмеченных -->
 				</div>
 				<div style="overflow-x: auto;">
 					<div style="margin-top:7px; margin-bottom:7px; border:1px; border-color:#777; border-style:solid; height:700px; overflow-y: auto;" id="div_stat"  valign="top">

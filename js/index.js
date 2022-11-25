@@ -526,9 +526,10 @@
 			var Totalizator = new totalizator();
 			
 			function ResultList()
-			{
+			{				
 				this.left_list = null;
 				this.right_list = null;
+				this.selection_list = null;
 			}
 
 			ResultList.prototype.CopyTable = function() 
@@ -607,9 +608,18 @@
 				
 			}
 
+			ResultList.prototype.getTopList = function()
+			{
+				var res_arr = new Array();
+				for(var _i=0; _i<this.selection_list;_i++)
+				{
+
+				}
+			}
+
 			ResultList.prototype.animate_draw = function(sorted, sel_idx, ctr_total)
 			{
-			//	reset_stat();
+				this.selection_list = sorted;
 
 				var keylist = Object.keys(sorted.items);// Array.from(sorted.keys());
 				
@@ -982,6 +992,8 @@
 			
 			ResultList.prototype.mark_left = function(_id, btn_obj, bool_val=null)
 			{
+				//var sel_on_sel = document.getElementById("cb_sel_on_sel").checked;
+
 				var obj_l_btns = null;
 				switch (tmode)
 				{
@@ -1400,26 +1412,56 @@
 					self.export_to_str();
 				}
 
+				document.getElementById("ll_export_add").onclick = function()
+				{
+					self.export_to_str(true);
+				}
+
 				document.getElementById("ll_import").onclick = function()
 				{
 					self.import_from_str();
 				}				
 			}
 
+			LeftList.prototype.filter_by_tops()
+			{
+				var cbs = document.querySelector("table#table_select input.cb_ll[type=checkbox]:checked");
+				var tops = result_list.getTopList();
+				for(_i=0;_i<valuelist.length;_i++)
+				{
+
+				}
+			}
+
 			LeftList.prototype.import_from_str = function()
 			{
 				var data_str = document.getElementById("ll_data_str").value;
 				var valuelist = data_str.split(", ");
-				this.Clear();
+				var correct_data = true;
+				var cbs = new Array();
 				for(_i=0;_i<valuelist.length;_i++)
 				{
 					var obj = document.querySelector("table#table_select input.cb_ll[type=checkbox][value='"+valuelist[_i]+"']");
-					obj.checked = true;
-					this.ll_cb_changed(obj);
+					if(obj==null)
+					{
+						correct_data = false;
+						break;
+					}
+					cbs.push(obj);
+				}
+				if(!correct_data)
+				{
+					return;
+				}
+				this.Clear();
+				for(_i=0;_i<cbs.length;_i++)
+				{
+					cbs[_i].checked = true;
+					this.ll_cb_changed(cbs[_i]);
 				}
 			}
 
-			LeftList.prototype.export_to_str = function()
+			LeftList.prototype.export_to_str = function(add=false)
 			{
 				var cb_list = document.querySelectorAll("table#table_select input.cb_ll[type=checkbox]:checked");
 				var str_res = "";
@@ -1428,13 +1470,12 @@
 				  });
 				var str = values.join(", ");
 
-				document.getElementById("ll_data_str").value = str;
+				
 
-				navigator.clipboard.writeText(str).then(function() {
-					//console.log('Async: Copying to clipboard was successful!');
-				  }, function(err) {
-					console.error('Async: Could not copy text: ', err);
-				  });
+				if(add) document.getElementById("ll_data_str").value = document.getElementById("ll_data_str").value + ", "+str;
+				else document.getElementById("ll_data_str").value = str;
+
+			
 			}
 
 			LeftList.prototype.ll_cb_changed = function(obj)
