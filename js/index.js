@@ -139,8 +139,7 @@
 			//var item_list = null;
 			var ref_mode = false;
 			var tmode = null;
-			var rmode = null;
-			
+					
 			
 /* Класс счетчик */
 			var CounterObj= new Counter();
@@ -272,7 +271,31 @@
 			var Selection = function()
 			{
 				this.h_stat = new Map();
-				this.items = new Object();
+				this.items = new Object();				
+			}
+
+			Selection.prototype.get_top = function()
+			{
+				var keylist = Object.keys(this.items);// Array.from(sorted.keys());
+				var old_val = 0;
+				var tops = new Array();
+				var count = 0;
+				var level = 0;
+				for(var i=0;i<keylist.length;i++)
+				{
+					tops.push(keylist[i]);
+					if(level>3) break;
+					if(this.items[keylist[i]]!=old_val)
+					{
+						level++;
+					}
+					else
+					{
+						
+					}
+					old_val = this.items[keylist[i]];
+				}
+				return tops;
 			}
 
 			Selection.prototype.get_leaders_count = function()
@@ -300,7 +323,7 @@
 				this.ctr = 0;
 				this.item_list = Array();
 				this.sharp_sets = true;
-				//this.h_stat = new Map();
+				this.mode = null;
 				this.last_idx = -1;
 				this.selection_list = Array();
 			}
@@ -345,7 +368,7 @@
 			totalizator.prototype.build_item_list = function()
 			{
 				var sel_list = document.querySelector('input#use_cb_list').checked;
-				switch(rmode)
+				switch(this.mode)
 				{
 					case 'names': 
 							if(sel_list)
@@ -382,7 +405,7 @@
 
 				var count_to_run = parseInt(document.getElementById("run_count").getAttribute("value"));
 								
-				rmode = document.querySelector('input[name="rb_action"]:checked').value;		
+				this.mode = document.querySelector('input[name="rb_action"]:checked').value;		
 				
 				this.build_item_list();
 				
@@ -445,6 +468,8 @@
 				CounterObj.trashman(this.selection_list);
 							
 				var that = this;
+				result_list.selection_list = this.selection_list;
+				result_list.mode = this.mode;
 				setTimeout(function(){
 					for(sel_idx = 0; sel_idx<sel_cnt; sel_idx++)
 						{
@@ -530,6 +555,7 @@
 				this.left_list = null;
 				this.right_list = null;
 				this.selection_list = null;
+				this.mode = null;
 			}
 
 			ResultList.prototype.CopyTable = function() 
@@ -611,16 +637,15 @@
 			ResultList.prototype.getTopList = function()
 			{
 				var res_arr = new Array();
-				for(var _i=0; _i<this.selection_list;_i++)
+				for(var _i=0; _i<this.selection_list.length;_i++)
 				{
-
+					res_arr = res_arr.concat(this.selection_list[_i].get_top());
 				}
+				return res_arr;
 			}
 
 			ResultList.prototype.animate_draw = function(sorted, sel_idx, ctr_total)
-			{
-				this.selection_list = sorted;
-
+			{				
 				var keylist = Object.keys(sorted.items);// Array.from(sorted.keys());
 				
 				var table_stat_full = document.getElementById("table_stat_full");			
@@ -655,7 +680,7 @@
 					
 					var the_id = null;
 					
-					switch(rmode)
+					switch(this.mode)
 					{
 						case 'names': 
 								the_id = namelist.indexOf(keylist[i]);
@@ -671,7 +696,7 @@
 					
 					var r_id = null;
 					
-					switch(rmode)
+					switch(this.mode)
 					{
 						case 'names': 
 						case 'pop_names':
@@ -684,7 +709,7 @@
 					
 					var l_id = null;
 					
-					switch(rmode)
+					switch(this.mode)
 					{
 						case 'names': 
 								l_id = namelist.indexOf(keylist[i]);
@@ -703,7 +728,7 @@
 
 					var _className = "pl_"+pl;
 					var _className_tr = "tr_pl_"+pl;
-					if(rmode=='refs')
+					if(this.mode=='refs')
 					{
 						var the_tr = document.createElement('tr');
 						the_tr.className =  _className_tr;	
@@ -892,7 +917,7 @@
 				if(btn_obj!=null)
 				{
 					
-					switch (rmode) 
+					switch (this.mode) 
 					{
 						case 'names': 
 						case 'pop_names':
@@ -998,7 +1023,7 @@
 				switch (tmode)
 				{
 					case 'names':
-						switch (rmode)
+						switch (this.mode)
 						{
 							case 'names':
 							case 'pop_names':
@@ -1021,7 +1046,7 @@
 						}
 						break;
 					case 'pop_names':
-						switch (rmode)
+						switch (this.mode)
 						{
 							case 'names':
 							case 'pop_names':
@@ -1046,7 +1071,7 @@
 						{
 							var iid = btn_obj.getAttribute("iid");
 							var name_id = btn_obj.getAttribute("name_id");
-							switch (rmode)
+							switch (this.mode)
 							{
 								case 'names':
 								case 'pop_names':
@@ -1420,14 +1445,28 @@
 				document.getElementById("ll_import").onclick = function()
 				{
 					self.import_from_str();
-				}				
+				}		
+				
+				document.getElementById("ll_filter").onclick = function()
+				{
+					self.filter_by_tops();
+				}
 			}
 
-			LeftList.prototype.filter_by_tops()
+			LeftList.prototype.filter_by_tops = function()
 			{
-				var cbs = document.querySelector("table#table_select input.cb_ll[type=checkbox]:checked");
+				var cbs = document.querySelectorAll("table#table_select input.cb_ll[type=checkbox]:checked");
 				var tops = result_list.getTopList();
-				for(_i=0;_i<valuelist.length;_i++)
+				switch(result_list.mode)
+				{
+					case 'names':
+						break;
+					case 'pop-names':
+						break;
+					case 'refs':
+						break;
+				}
+				for(_i=0;_i<cbs.length;_i++)
 				{
 
 				}
@@ -1491,7 +1530,7 @@
 							}
 							break;
 						case 'refs': 
-							switch(rmode)
+							switch(this.mode)
 							{
 								case 'refs': 
 									var btns = document.querySelectorAll('button.btn_left[iid="'+obj.getAttribute("iid")+'"]');

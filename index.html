@@ -58,12 +58,16 @@
 					</table>
 				</fieldset>
 				<fieldset id="fs_ts" style="display:none">
-					<input type="submit" value="Сбросить" id="ll_clear" />
+					
 					<input type="submit" value="Экспорт" id="ll_export" />
-					<input type="submit" value="Экспорт с добавлением" id="ll_export_add" />
+					<input type="submit" value="С добавлением" id="ll_export_add" />
 					<input type="submit" value="Импорт" id="ll_import" />
+					<input type="submit" value="Фильтр" title="Фильтр по топам" id="ll_filter" placeholder="" />
+					<input type="submit" value="Сбросить" id="ll_clear" />
 					<br />
 					<textarea cols="51" rows="3" style="margin-top:4px;max-width:402px;" id="ll_data_str"></textarea>
+						
+					<br />
 					<div style="margin-top:7px; margin-bottom:7px; border:1px; border-color:#777; border-style:solid; height:500px; overflow-y: scroll;"  valign="top">
 											
 						<table id="table_select" valign="top" width="100%"></table>
