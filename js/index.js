@@ -23,55 +23,11 @@
 				}
 				return val;
 			}
-			
-			function random_mixed_array(arr_src)
-			{
-				var arr_dst = new Array();
-				var arr_cloned = arrayClone(arr_src);
-				var lng_first = arr_src.length;
-				for(i=0;i<lng_first;i++)
-				{
-					var idx = getRandomInt(arr_cloned.length-1);
-					arr_dst.push(arr_cloned[idx]);
-					arr_cloned.splice(idx,1);
-					
-				}
-				return arr_dst;
-			}
-			
-			function build_map_sorted(_map,_obj)
-			{
-				var keylist = Array.from(_map.keys());
-				Object.getOwnPropertyNames(_obj).forEach(function (prop) 
-					{
-					  delete _obj[prop];
-					}
-				);
-				var _length = keylist.length;
-				for(var j=0;j<_length;j++)
-				{
-					var max = 0;
-					var max_key = "";
-					var max_idx = 0;
-					for(var i=0;i<keylist.length;i++)
-					{
-						if(_map.get(keylist[i])>max)
-						{							
-							max = _map.get(keylist[i]);
-							max_key = keylist[i];
-							max_idx = i;							
-						}
-					}
-					
-					_obj[max_key] = max;
-					keylist.splice(max_idx, 1); 
-				}
-			}
-			
-			function sort_map(_map) 
+						
+			Map.prototype.sort = function(_map) // sort_map
 			{
 				var new_map = new Map();
-				var keylist = Array.from(_map.keys());
+				var keylist = Array(this.keys());// Array.from(_map.keys());
 				var _length = keylist.length;
 				for(var j=0;j<_length;j++)
 				{
@@ -80,9 +36,9 @@
 					var max_idx = 0;
 					for(var i=0;i<keylist.length;i++)
 					{
-						if(_map.get(keylist[i])>max)
+						if(this.get(keylist[i])>max)
 						{
-							max = _map.get(keylist[i]);
+							max = this.get(keylist[i]);
 							max_key = keylist[i];
 							max_idx = i;
 						}
@@ -95,54 +51,41 @@
 				return new_map;
 			}
 			
-			function set_by_cb_sels(_tmode)
+			Array.prototype.Clone = function()
 			{
-				var arr = new Array();
-				document.querySelectorAll('table#table_select  input[type="checkbox"]').forEach(
-					function(cb)
-					{
-						if(cb.checked)
-						{
-							arr.push(cb.getAttribute('value'));
-						}						
-					}
-				);	
-				return arr;
-			}
-			
-			function arrayClone(arr) 
-			{
-				var i, copy;
-				
-				if (Array.isArray(arr)) 
+				var copy = new Array();
+				for (var i = 0; i < this.length; i++) 
 				{
-					copy = arr.slice(0);
-					for (i = 0; i < copy.length; i++) 
-					{
-						copy[i] = arrayClone(copy[i]);
-					}
-					return copy;
-				} 
-				else if (typeof arr === 'object') 
-				{
-					throw 'Cannot clone array containing an object!';
-				} 
-				else 
-				{
-					return arr;
+					copy[i] = this[i];//.Clone();
 				}
+				return copy;			
 			}
-			
-			
-			//var h_stat = new Map();
-			
-			//var item_list = null;
-			var ref_mode = false;
-			var tmode = null;
+
+			Array.prototype.in_array = function(p_val) {
+				for(var i = 0, l = this.length; i < l; i++)	{
+					if(this[i] == p_val) {
+						return true;
+					}
+				}
+				return false;
+			}
+
+			Array.prototype.random_mixed = function()
+			{
+				var arr_dst = new Array();
+				var arr_cloned = this.Clone();// arrayClone(arr_src);
+				var lng_first = this.length;
+				for(i=0;i<lng_first;i++)
+				{
+					var idx = getRandomInt(arr_cloned.length-1);
+					arr_dst.push(arr_cloned[idx]);
+					arr_cloned.splice(idx,1);
 					
+				}
+				return arr_dst;
+			}
+
 			
-/* Класс счетчик */
-			var CounterObj= new Counter();
 
 			function Counter()
 			{
@@ -198,10 +141,10 @@
 
 			Counter.prototype.out = function()
 			{
-				var sorted = sort_map(this.ctrlist);
+				var sorted = this.ctrlist.sort();// sort_map(this.ctrlist);
 				var s_keys = Array.from(sorted.keys());
 				var ctr_table = document.getElementById("ctr_table");
-				if(tmode=="refs")
+				if(this.mode=="refs")
 				{
 					ctr_table.innerHTML = "<tr><th></th><th></th><th>Очков</th></tr>";	
 				}
@@ -214,7 +157,7 @@
 					var tr_item = document.createElement('tr');
 					var td_name = document.createElement('td');					
 
-					if(tmode=="refs")
+					if(this.mode=="refs")
 					{
 						var td_a = document.createElement('td');
 						var obj_a = document.createElement('a');
@@ -290,6 +233,37 @@
 				}
 			}
 
+			Selection.prototype.build_sorted = function()
+			{
+				//	build_map_sorted(selection.h_stat,selection.items);
+				var keylist = Array.from(this.h_stat.keys());
+				var self = this;
+				Object.getOwnPropertyNames(this.items).forEach(function (prop) 
+					{
+						delete self.items[prop];
+					}
+				);
+				var _length = keylist.length;
+				for(var j=0;j<_length;j++)
+				{
+					var max = 0;
+					var max_key = "";
+					var max_idx = 0;
+					for(var i=0;i<keylist.length;i++)
+					{
+						if(this.h_stat.get(keylist[i])>max)
+						{							
+							max = this.h_stat.get(keylist[i]);
+							max_key = keylist[i];
+							max_idx = i;							
+						}
+					}
+					
+					this.items[max_key] = max;
+					keylist.splice(max_idx, 1); 
+				}
+			}
+
 			Selection.prototype.get_name_id = function(_key)
 			{
 				switch(this.mode)
@@ -362,7 +336,7 @@
 				return count;
 			}
 
-			var totalizator = function ()
+			var Totalizator = function ()
 			{
 				this.ctr = 0;
 				this.item_list = Array();
@@ -372,7 +346,22 @@
 				this.selection_list = Array();
 			}
 
-			totalizator.prototype.init = function()
+			Totalizator.prototype.set_by_cb_sels = function(_tmode)
+			{
+				var arr = new Array();
+				document.querySelectorAll('table#table_select  input[type="checkbox"]').forEach(
+					function(cb)
+					{
+						if(cb.checked)
+						{
+							arr.push(cb.getAttribute('value'));
+						}						
+					}
+				);	
+				return arr;
+			}
+
+			Totalizator.prototype.init = function()
 			{
 				var rbm_cbs = document.querySelectorAll('input[type="radio"][class="rb_mode"]');
 				for(var _i=0;_i<rbm_cbs.length;_i++)
@@ -397,7 +386,7 @@
 				}
 			}
 
-			totalizator.prototype.switch_ts = function()
+			Totalizator.prototype.switch_ts = function()
 			{
 				if(document.getElementById("fs_ts").style.display=='none')
 				{
@@ -409,33 +398,33 @@
 				}
 			}
 
-			totalizator.prototype.build_item_list = function()
+			Totalizator.prototype.build_item_list = function()
 			{
 				var sel_list = document.querySelector('input#use_cb_list').checked;
 				switch(this.mode)
 				{
 					case 'names': 
 							if(sel_list)
-								this.item_list = set_by_cb_sels(tmode);
+								this.item_list = this.set_by_cb_sels(tmode);
 							else 
-								this.item_list = random_mixed_array(namelist);
+								this.item_list = namelist.random_mixed();
 						break;
 					case 'pop_names': 
 							if(sel_list)
-								this.item_list = set_by_cb_sels(tmode);
+								this.item_list = this.set_by_cb_sels(tmode);
 							else
-								this.item_list = random_mixed_array(pop_namelist);
+								this.item_list = pop_namelist.random_mixed();
 						break;
 					case 'refs': 
 							if(sel_list)
-								this.item_list = set_by_cb_sels(tmode);
+								this.item_list = this.set_by_cb_sels(tmode);
 							else
-								this.item_list = random_mixed_array(Object.keys(reflist));
+								this.item_list = Object.keys(reflist).random_mixed();
 						break;				
 				}
 			}
 		
-			totalizator.prototype.run = function()
+			Totalizator.prototype.run = function()
 			{
 				document.getElementById("btn_go").disabled = true;
 
@@ -479,7 +468,7 @@
 				for(sel_idx = 0; sel_idx<sel_cnt; sel_idx++)
 				{
 					//h_stat = new Map();
-					this.item_list = random_mixed_array(this.item_list);
+					this.item_list = this.item_list.random_mixed();
 
 					var selection = new Selection();
 					
@@ -528,7 +517,7 @@
 
 			}
 
-			totalizator.prototype.close_animation = function(success)
+			Totalizator.prototype.close_animation = function(success)
 			{
 				document.getElementById("div_load").style.display = "none";
 				document.getElementById("div_stat").style.display = "block";
@@ -539,7 +528,7 @@
 				document.getElementById("btn_go").disabled = false;
 			}
 
-			totalizator.prototype.run_one = function(selection)
+			Totalizator.prototype.run_one = function(selection)
 			{						
 				
 				/*
@@ -561,11 +550,11 @@
 
 				this.ctr++;
 
-				build_map_sorted(selection.h_stat,selection.items);
+				selection.build_sorted();//	build_map_sorted(selection.h_stat,selection.items);
 								
 			}
 
-			totalizator.prototype.one_iteration = function(selection, count_to_run)
+			Totalizator.prototype.one_iteration = function(selection, count_to_run)
 			{				
 
 				this.last_idx = -1;
@@ -578,7 +567,7 @@
 				
 			}
 			
-			totalizator.prototype.reset_stat = function()
+			Totalizator.prototype.reset_stat = function()
 			{
 				var table_stat_full = document.getElementById("table_stat_full");
 				
@@ -589,7 +578,7 @@
 				table_stat_full.style.display = 'block';
 			}
 			
-			var Totalizator = new totalizator();
+			
 			
 			function ResultList()
 			{				
@@ -697,7 +686,7 @@
 				var table_stat = document.createElement('table');
 				table_stat.setAttribute("class","tbl_selection");
 
-				if(tmode=='refs')
+				if(this.mode=='refs')
 				{
 					table_stat.innerHTML = "<tr><th>Ссылка</th><th>Процент</th></tr>";
 				}
@@ -951,8 +940,6 @@
 				btn_obj.setAttribute("title","Сбросить слева");
 			}
 
-			
-
 			ResultList.prototype.draw_btn_left = function(btn_obj)
 			{
 				if(btn_obj!=null)
@@ -984,7 +971,7 @@
 							break;
 						case 'refs': 
 						
-								switch(tmode)
+								switch(this.mode)
 								{
 									case 'names':
 									case 'pop_names':
@@ -1053,7 +1040,7 @@
 				//var sel_on_sel = document.getElementById("cb_sel_on_sel").checked;
 
 				var obj_l_btns = null;
-				switch (tmode)
+				switch (result_list.mode)// tmode)
 				{
 					case 'names':
 						switch (this.mode)
@@ -1160,8 +1147,6 @@
 					
 				}
 			}
-
-			
 			
 			function RightList()
 			{
@@ -1187,7 +1172,7 @@
 				var keylist = Array.from(this.earn_map.keys());
 				var summ = 0;
 				
-				var nl_clone = random_mixed_array(arrayClone(namelist));
+				var nl_clone = namelist.Clone().random_mixed();
 				for(var i=0;i<keylist.length;i++)
 				{
 					var ctr = 0;
@@ -1207,7 +1192,7 @@
 					var procent = 100 - this.earn_map.get(keylist[i])*100/summ;
 					this.earn_map.set(keylist[i],procent);
 				}
-				var sorted = sort_map(this.earn_map);
+				var sorted = this.earn_map.sort();// sort_map(this.earn_map);
 				keylist = Array.from(sorted.keys());
 				//clear_earn_stat();
 				document.getElementById("earn_stat").innerHTML = "<tr><th>Имя</th><th>Вероятность</th></tr>";
@@ -1269,7 +1254,7 @@
 				document.getElementById('rl_run').onclick = this.run;
 				document.getElementById('clear_stat').onclick = function(){ self.clear_stat(this) };
 
-				items = arrayClone(namelist);
+				items = namelist.Clone();// arrayClone(namelist);
 				items.sort();
 				
 				var ref_keys = Object.keys(reflist);
@@ -1349,25 +1334,25 @@
 
 				this.mode = t_mode;
 
-				tmode = t_mode;
+			//	tmode = t_mode;
 				var table_id =  'table_select';
 				var prefix='cb_sel_';
 
 				var res_items = document.getElementById(table_id);
 				res_items.innerHTML = "";
 				var items = null;
-				switch(tmode)
+				switch(this.mode)
 				{
 					case 'names': 
-							items = arrayClone(namelist);
+							items = namelist.Clone();
 							items.sort();
 						break;
 					case 'pop_names': 
-							items = arrayClone(pop_namelist);
+							items = pop_namelist.Clone(); //arrayClone(pop_namelist);
 							items.sort();
 						break;
 					case 'refs': 
-							items = arrayClone(Object.keys(reflist));
+							items = Object.keys(reflist).Clone();// arrayClone(Object.keys(reflist));
 						break;				
 				}
 				
@@ -1385,7 +1370,7 @@
 					
 					var the_id = prefix;					
 					
-					switch(tmode)
+					switch(this.mode)
 					{
 						case 'names': 
 								the_id = namelist.indexOf(items[i]);
@@ -1400,7 +1385,7 @@
 					
 					var name_id = null;
 					
-					if(tmode=="refs")
+					if(this.mode=="refs")
 					{
 						name_id = namelist.indexOf(reflist[items[i]]);						
 					}
@@ -1429,7 +1414,7 @@
 					
 					obj_label.setAttribute("for",el_id);
 					obj_label.setAttribute('style','display : block');
-					if(tmode=="refs")
+					if(this.mode=="refs")
 					{
 						var td_a = document.createElement('a');
 						td_a.textContent = items[i];
@@ -1448,7 +1433,7 @@
 					td_1.appendChild(obj_label);
 					the_tr.appendChild(td_cb);
 					the_tr.appendChild(td_1);
-					if(tmode=="refs")
+					if(this.mode=="refs")
 					{
 						var td_2 = document.createElement('td');
 						var obj_label_2 = document.createElement('label');
@@ -1499,14 +1484,7 @@
 				}
 			}
 
-			Array.prototype.in_array = function(p_val) {
-				for(var i = 0, l = this.length; i < l; i++)	{
-					if(this[i] == p_val) {
-						return true;
-					}
-				}
-				return false;
-			}		
+					
 
 			LeftList.prototype.filter_by_tops = function()
 			{
@@ -1594,17 +1572,23 @@
 				  });
 				var str = values.join(", ");
 
-				
-
-				if(add) document.getElementById("ll_data_str").value = document.getElementById("ll_data_str").value + ", "+str;
+				if(add) 
+				{
+					if(document.getElementById("ll_data_str").value=="")
+					{
+						document.getElementById("ll_data_str").value = str;
+					}
+					else
+					{
+						document.getElementById("ll_data_str").value = document.getElementById("ll_data_str").value + ", "+str;
+					}
+				}
 				else document.getElementById("ll_data_str").value = str;
-
-			
 			}
 
 			LeftList.prototype.ll_cb_changed = function(obj)
 			{
-				switch(tmode)
+				switch(this.mode)
 					{
 						case 'names': 			
 						case 'pop_names': 
@@ -1655,10 +1639,11 @@
 
 				
 			}
-			
+
+			var totalizator = new Totalizator();			
 			var left_list = new LeftList();
 			var right_list = new RightList();
-
+			var CounterObj= new Counter();
 			var result_list = new ResultList();
 			
 			document.addEventListener("DOMContentLoaded", function(event) 
@@ -1675,7 +1660,7 @@
 						CounterObj.clear(); 
 					}
 					
-					Totalizator.init();
+					totalizator.init();
 				}
 			);
 			
