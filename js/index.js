@@ -24,10 +24,10 @@
 				return val;
 			}
 						
-			Map.prototype.sort = function(_map) // sort_map
+			Map.prototype.sort = function() // sort_map
 			{
 				var new_map = new Map();
-				var keylist = Array(this.keys());// Array.from(_map.keys());
+				var keylist = Array.from(this.keys());// Array.from(_map.keys());
 				var _length = keylist.length;
 				for(var j=0;j<_length;j++)
 				{
@@ -405,19 +405,19 @@
 				{
 					case 'names': 
 							if(sel_list)
-								this.item_list = this.set_by_cb_sels(tmode);
+								this.item_list = this.set_by_cb_sels(this.mode);
 							else 
 								this.item_list = namelist.random_mixed();
 						break;
 					case 'pop_names': 
 							if(sel_list)
-								this.item_list = this.set_by_cb_sels(tmode);
+								this.item_list = this.set_by_cb_sels(this.mode);
 							else
 								this.item_list = pop_namelist.random_mixed();
 						break;
 					case 'refs': 
 							if(sel_list)
-								this.item_list = this.set_by_cb_sels(tmode);
+								this.item_list = this.set_by_cb_sels(this.mode);
 							else
 								this.item_list = Object.keys(reflist).random_mixed();
 						break;				
@@ -497,6 +497,7 @@
 					selection.mode = this.mode;
 					this.selection_list.push(selection);
 					
+					CounterObj.mode = this.mode;
 					CounterObj.add_map(selection.items);
 				}
 
