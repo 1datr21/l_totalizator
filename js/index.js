@@ -274,7 +274,39 @@
 				this.items = new Object();				
 			}
 
-			Selection.prototype.get_top = function()
+			Selection.prototype.get_iid = function(_key)
+			{
+				switch(this.mode)
+				{
+					case 'names':
+							return namelist.indexOf(_key);
+						break;
+					case 'pop_names':
+							return pop_namelist.indexOf(_key);
+						break;
+					case 'refs':
+							return ref_keys.indexOf(_key);;
+						break;
+				}
+			}
+
+			Selection.prototype.get_name_id = function(_key)
+			{
+				switch(this.mode)
+				{
+					case 'names':
+							return namelist.indexOf(_key);
+						break;
+					case 'pop_names':
+							return namelist.indexOf(_key);
+						break;
+					case 'refs':
+							return namelist.indexOf(reflist[_key]);
+						break;
+				}
+			}
+
+			Selection.prototype.get_top = function(tlmode)
 			{
 				var keylist = Object.keys(this.items);// Array.from(sorted.keys());
 				var old_val = 0;
@@ -283,7 +315,16 @@
 				var level = 0;
 				for(var i=0;i<keylist.length;i++)
 				{
-					tops.push(keylist[i]);
+					if(tlmode=='iid')
+					{
+						val_to_array = this.get_iid(keylist[i]);
+					}
+					else
+					{
+						val_to_array = this.get_name_id(keylist[i]);
+					}
+
+					tops.push(val_to_array);
 					if(level>3) break;
 					if(this.items[keylist[i]]!=old_val)
 					{
@@ -293,7 +334,10 @@
 					{
 						
 					}
-					old_val = this.items[keylist[i]];
+
+					var val_to_array = null;
+					
+					old_val = this.items[val_to_array];
 				}
 				return tops;
 			}
@@ -438,6 +482,7 @@
 					this.item_list = random_mixed_array(this.item_list);
 
 					var selection = new Selection();
+					
 					if(this.sharp_sets)
 					{	
 						leader_count = 0;
@@ -460,6 +505,7 @@
 						this.one_iteration(selection, count_to_run);
 						//animate_draw(selection);
 					}
+					selection.mode = this.mode;
 					this.selection_list.push(selection);
 					
 					CounterObj.add_map(selection.items);
@@ -521,9 +567,7 @@
 
 			totalizator.prototype.one_iteration = function(selection, count_to_run)
 			{				
-				//reset_stat();
-								
-				//var sorted = null;
+
 				this.last_idx = -1;
 				for(var _i=0;_i<count_to_run; _i++)
 				{
@@ -532,10 +576,7 @@
 								
 				}
 				
-				//return sorted;
 			}
-
-			
 			
 			totalizator.prototype.reset_stat = function()
 			{
@@ -634,12 +675,12 @@
 				
 			}
 
-			ResultList.prototype.getTopList = function()
+			ResultList.prototype.getTopList = function(tlmode)
 			{
 				var res_arr = new Array();
 				for(var _i=0; _i<this.selection_list.length;_i++)
 				{
-					res_arr = res_arr.concat(this.selection_list[_i].get_top());
+					res_arr = res_arr.concat(this.selection_list[_i].get_top(tlmode));
 				}
 				return res_arr;
 			}
@@ -994,15 +1035,7 @@
 					
 					
 				}				
-				var _count = document.querySelectorAll('#fs_ts input[type="checkbox"]:checked').length;
-				if(_count)
-				{
-					document.getElementById("left_sel_count").innerHTML = "Выбрано "+_count + " галочек";
-				}
-				else
-				{
-					document.getElementById("left_sel_count").innerHTML = "";
-				}
+				left_list.CalcCountAndDraw();
 			}
 								
 			ResultList.prototype.mark_top_3_left = function()
@@ -1297,6 +1330,19 @@
 				this.mode = null;
 			}
 
+			LeftList.prototype.CalcCountAndDraw = function()
+			{
+				var _count = document.querySelectorAll('#fs_ts input[type="checkbox"]:checked').length;
+				if(_count)
+				{
+					document.getElementById("left_sel_count").innerHTML = "Выбрано "+_count + " галочек";
+				}
+				else
+				{
+					document.getElementById("left_sel_count").innerHTML = "";
+				}
+			}
+
 			LeftList.prototype.build = function(t_mode)
 			{
 				CounterObj.clear();
@@ -1453,22 +1499,61 @@
 				}
 			}
 
+			Array.prototype.in_array = function(p_val) {
+				for(var i = 0, l = this.length; i < l; i++)	{
+					if(this[i] == p_val) {
+						return true;
+					}
+				}
+				return false;
+			}		
+
 			LeftList.prototype.filter_by_tops = function()
 			{
 				var cbs = document.querySelectorAll("table#table_select input.cb_ll[type=checkbox]:checked");
-				var tops = result_list.getTopList();
+				var tlmode = '';
+				var attr_cbs = "";
 				switch(result_list.mode)
 				{
 					case 'names':
-						break;
-					case 'pop-names':
+					case 'pop_names':
+						switch(this.mode)
+						{
+							case 'names':
+							case 'pop_names':
+								tlmode = 'iid';
+								attr_cbs = 'iid';
+								break;
+							case 'refs':
+								tlmode = 'name_id';
+								attr_cbs = 'name_id';
+								break;
+						}
 						break;
 					case 'refs':
+						switch(this.mode)
+						{
+							case 'names':
+							case 'pop_names':
+								tlmode = 'name_id';
+								attr_cbs = 'name_id';
+								break;
+							case 'refs':
+								tlmode = 'iid';	
+								attr_cbs = 'name_id';
+								break;
+						}
 						break;
 				}
+				var tops = result_list.getTopList(tlmode);
 				for(_i=0;_i<cbs.length;_i++)
-				{
-
+				{					
+					var the_id = cbs[_i].getAttribute(attr_cbs);
+					if(!tops.in_array(the_id))
+					{
+						cbs[_i].checked = false;
+						this.ll_cb_changed(cbs[_i]);
+					}
 				}
 			}
 
@@ -1553,7 +1638,8 @@
 							}
 							//	r_id = namelist.indexOf(reflist[keylist[i]]);
 							break;				
-					}				
+					}		
+				this.CalcCountAndDraw();	
 			}
 
 			LeftList.prototype.Clear = function()
