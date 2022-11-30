@@ -288,7 +288,14 @@
 				var count = 0;
 				var level = 0;
 				for(var i=0;i<keylist.length;i++)
-				{
+				{					
+					if(this.items[keylist[i]]!=old_val)
+					{
+						level++;
+					}
+
+					if(level>3) break;
+
 					if(tlmode=='iid')
 					{
 						val_to_array = this.get_iid(keylist[i]);
@@ -299,19 +306,9 @@
 					}
 
 					tops.push(val_to_array);
-					if(level>3) break;
-					if(this.items[keylist[i]]!=old_val)
-					{
-						level++;
-					}
-					else
-					{
-						
-					}
-
-					var val_to_array = null;
 					
-					old_val = this.items[val_to_array];
+									
+					old_val = this.items[keylist[i]];
 				}
 				return tops;
 			}
