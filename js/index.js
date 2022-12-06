@@ -785,7 +785,7 @@
 												
 						var self = this;
 
-						btn_1.onclick = function() { self.mark_left(the_id, this); }
+						btn_1.onclick = function() { self.mark_left(this); }
 						//btn_1.setAttribute("onclick","mark_left("+the_id+", this)");
 						btn_1.setAttribute("iid",l_id);
 						btn_1.setAttribute("name_id",name_id);
@@ -800,9 +800,9 @@
 						var btn_r = document.createElement('button');
 						
 						//btn_r.setAttribute("onclick","mark_right("+r_id+", this)");
-						btn_r.onclick = function() { self.mark_right(the_id, this); }
+						btn_r.onclick = function() { self.mark_right(this); }
 						btn_r.setAttribute("class","btn_right");
-						btn_r.setAttribute("rid",r_id);
+						btn_r.setAttribute("rid",name_id);
 						td_btn2.appendChild(btn_r);
 						this.draw_btn_right(btn_r);
 						
@@ -831,7 +831,7 @@
 						//btn_1.textContent = "Отметить слева";
 						//btn_1.setAttribute("onclick","mark_left("+ the_id +", this)");
 						var self = this;
-						btn_1.onclick = function() { self.mark_left(the_id, this); };
+						btn_1.onclick = function() { self.mark_left(this); };
 						btn_1.setAttribute("iid",r_id);
 						btn_1.setAttribute("name_id",name_id);
 						btn_1.setAttribute("class","btn_left");
@@ -846,9 +846,9 @@
 						var r_sel_ch = document.getElementById(prefix_r+r_id);
 																		
 						//btn_r.setAttribute("onclick","mark_right("+ r_id+", this)");
-						btn_r.onclick = function() { self.mark_right(the_id, this); };
+						btn_r.onclick = function() { self.mark_right(this); };
 						btn_r.setAttribute("class","btn_right");
-						btn_r.setAttribute("rid",r_id);
+						btn_r.setAttribute("rid",name_id);//r_id);
 						td_btn2.appendChild(btn_r);
 						
 						this.draw_btn_right(btn_r);
@@ -1029,11 +1029,11 @@
 				var btns_l_list = document.querySelectorAll('table.tbl_selection td.pl_1 button.btn_left, table.tbl_selection td.pl_2 button.btn_left, table.tbl_selection td.pl_3 button.btn_left');
 				for(var _i=0;_i<btns_l_list.length;_i++)
 				{
-					this.mark_left(btns_l_list[_i].getAttribute("iid"), btns_l_list[_i], true);
+					this.mark_left(btns_l_list[_i], true);
 				}
 			}
 			
-			ResultList.prototype.mark_left = function(_id, btn_obj, bool_val=null)
+			ResultList.prototype.mark_left = function(btn_obj, bool_val=null)
 			{
 				//var sel_on_sel = document.getElementById("cb_sel_on_sel").checked;
 
@@ -1131,8 +1131,9 @@
 			
 			}
 			
-			ResultList.prototype.mark_right = function(_id, _btn_obj)
+			ResultList.prototype.mark_right = function(_btn_obj)
 			{
+				var _id = _btn_obj.getAttribute("rid");
 				var rb = document.getElementById(prefix_r+_id);
 				if(rb!=null)
 				{
@@ -1242,7 +1243,7 @@
 			RightList.prototype.build = function(r_mode)
 			{
 				var table_id = "earn_items";
-				var prefix='cb_sel_r_'; 
+			//	var prefix='cb_sel_r_'; 
 				var res_items = document.getElementById(table_id);
 				res_items.innerHTML = "";
 				var items = null;
