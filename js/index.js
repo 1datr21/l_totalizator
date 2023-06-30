@@ -1542,7 +1542,8 @@
 				var cbs = new Array();
 				for(_i=0;_i<valuelist.length;_i++)
 				{
-					var obj = document.querySelector("table#table_select input.cb_ll[type=checkbox][value='"+valuelist[_i]+"']");
+					var selector = "table#table_select input.cb_ll[type=checkbox][value='"+valuelist[_i]+"']";
+					var obj = document.querySelector(selector);
 					if(obj==null)
 					{
 						correct_data = false;
