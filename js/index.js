@@ -831,7 +831,9 @@
 						//btn_1.textContent = "Отметить слева";
 						//btn_1.setAttribute("onclick","mark_left("+ the_id +", this)");
 						var self = this;
-						btn_1.onclick = function() { self.mark_left(this); };
+						btn_1.onclick = function() { 
+							self.mark_left(this); 
+						};
 						btn_1.setAttribute("iid",r_id);
 						btn_1.setAttribute("name_id",name_id);
 						btn_1.setAttribute("class","btn_left");
@@ -846,7 +848,9 @@
 						var r_sel_ch = document.getElementById(prefix_r+r_id);
 																		
 						//btn_r.setAttribute("onclick","mark_right("+ r_id+", this)");
-						btn_r.onclick = function() { self.mark_right(this); };
+						btn_r.onclick = function() { 
+							self.mark_right(this); 
+						};
 						btn_r.setAttribute("class","btn_right");
 						btn_r.setAttribute("rid",name_id);//r_id);
 						td_btn2.appendChild(btn_r);
@@ -943,7 +947,7 @@
 				if(btn_obj!=null)
 				{
 					
-					switch (this.mode) 
+					switch (left_list.mode) 
 					{
 						case 'names': 
 						case 'pop_names':
@@ -1038,10 +1042,10 @@
 				//var sel_on_sel = document.getElementById("cb_sel_on_sel").checked;
 
 				var obj_l_btns = null;
-				switch (result_list.mode)// tmode)
+				switch (this.mode)// tmode)
 				{
 					case 'names':
-						switch (this.mode)
+						switch (left_list.mode)
 						{
 							case 'names':
 							case 'pop_names':
@@ -1054,17 +1058,28 @@
 										break;
 									}				
 									
+									var ll_btns = document.querySelectorAll('#fs_ts input[type="checkbox"][name_id="'+name_id+'"]')
 									if(bool_val==null)
-										document.querySelector('#fs_ts input[type="checkbox"][name_id="'+name_id+'"]').checked = !document.querySelector('#fs_ts input[type="checkbox"][name_id="'+name_id+'"]').checked;
+									{
+										for(var i=0;i<ll_btns.length;i++)
+										{
+											ll_btns[i].checked = !ll_btns[i].checked;
+										}
+									}
 									else
-										document.querySelector('#fs_ts input[type="checkbox"][name_id="'+name_id+'"]').checked = bool_val;
-									
+									{
+										for(var i=0;i<ll_btns.length;i++)
+										{
+											ll_btns[i].checked = bool_val;
+										}
+										//document.querySelector('#fs_ts input[type="checkbox"][name_id="'+name_id+'"]').checked = bool_val;
+									}
 									obj_l_btns = document.querySelectorAll('button.btn_left[name_id="'+name_id+'"]');// document.getElementById(prefix_l + iid);
 								break;																			
 						}
 						break;
 					case 'pop_names':
-						switch (this.mode)
+						switch (left_list.mode)
 						{
 							case 'names':
 							case 'pop_names':
@@ -1076,11 +1091,29 @@
 										
 										break;
 									}
+
+									var ll_btns = document.querySelectorAll('#fs_ts input[type="checkbox"][name_id="'+name_id+'"]')
+									if(bool_val==null)
+									{
+										for(var i=0;i<ll_btns.length;i++)
+										{
+											ll_btns[i].checked = !ll_btns[i].checked;
+										}
+									}
+									else
+									{
+										for(var i=0;i<ll_btns.length;i++)
+										{
+											ll_btns[i].checked = bool_val;
+										}
+										//document.querySelector('#fs_ts input[type="checkbox"][name_id="'+name_id+'"]').checked = bool_val;
+									}
+									/*
 									if(bool_val==null)
 										document.querySelector('#fs_ts input[type="checkbox"][name_id="'+name_id+'"]').checked = !document.querySelector('#fs_ts input[type="checkbox"][name_id="'+name_id+'"]').checked;
 									else
 										document.querySelector('#fs_ts input[type="checkbox"][name_id="'+name_id+'"]').checked = bool_val;
-								
+								*/
 									obj_l_btns = document.querySelectorAll('button.btn_left[name_id="'+name_id+'"]');// document.getElementById(prefix_l + iid);
 								break;																			
 						}
@@ -1089,7 +1122,7 @@
 						{
 							var iid = btn_obj.getAttribute("iid");
 							var name_id = btn_obj.getAttribute("name_id");
-							switch (this.mode)
+							switch (left_list.mode)
 							{
 								case 'names':
 								case 'pop_names':
@@ -1104,7 +1137,7 @@
 												cbs[_i].checked = bool_val;
 										}
 										
-										obj_l_btns = document.querySelectorAll('button.btn_left[name_id="'+name_id+'"]');// document.getElementById(prefix_l + iid);
+										obj_l_btns = document.querySelectorAll('button.btn_left[name_id="'+name_id+'"]');// document.getElementById(prefix_l + iid);										
 									break;
 								case 'refs':
 										if(bool_val==null)
